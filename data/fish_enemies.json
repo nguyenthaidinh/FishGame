@@ -1,0 +1,36 @@
+{
+  "map1": [
+    {
+      "id": "fishsmall",
+      "path": "assets/fish/enemies/map1/fishsmall",
+      "size": 12,
+      "speed": 120,
+      "ai": "wander",
+      "can_eat_player": false
+    },
+    {
+      "id": "fish01",
+      "path": "assets/fish/enemies/map1/fish01",
+      "size": 18,
+      "speed": 140,
+      "ai": "wander",
+      "can_eat_player": false
+    },
+    {
+      "id": "fish05",
+      "path": "assets/fish/enemies/map1/fish05",
+      "size": 28,
+      "speed": 160,
+      "ai": "predator",
+      "can_eat_player": true
+    },
+    {
+      "id": "turtle01",
+      "path": "assets/fish/enemies/map1/turtle01",
+      "size": 42,
+      "speed": 90,
+      "ai": "predator",
+      "can_eat_player": true
+    }
+  ]
+}

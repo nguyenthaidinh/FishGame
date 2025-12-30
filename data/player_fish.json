@@ -1,0 +1,62 @@
+{
+  "fish01": {
+    "name": "Fish 01",
+    "path": "assets/fish/player/fish01",
+    "unlock": { "type": "default" }
+  },
+  "fish02": {
+    "name": "Fish 02",
+    "path": "assets/fish/player/fish02",
+    "unlock": { "type": "score", "value": 200 }
+  },
+  "fish03": {
+    "name": "Fish 03",
+    "path": "assets/fish/player/fish03",
+    "unlock": { "type": "score", "value": 400 }
+  },
+  "fish04": {
+    "name": "Fish 04",
+    "path": "assets/fish/player/fish04",
+    "unlock": { "type": "win_map", "mapId": 1 }
+  },
+  "fish05": {
+    "name": "Fish 05",
+    "path": "assets/fish/player/fish05",
+    "unlock": { "type": "score", "value": 800 }
+  },
+  "fish06": {
+    "name": "Fish 06",
+    "path": "assets/fish/player/fish06",
+    "unlock": { "type": "win_map", "mapId": 2 }
+  },
+  "fish07": {
+    "name": "Fish 07",
+    "path": "assets/fish/player/fish07",
+    "unlock": { "type": "score", "value": 1200 }
+  },
+  "fish08": {
+    "name": "Fish 08",
+    "path": "assets/fish/player/fish08",
+    "unlock": { "type": "score", "value": 1600 }
+  },
+  "fish09": {
+    "name": "Fish 09",
+    "path": "assets/fish/player/fish09",
+    "unlock": { "type": "win_map", "mapId": 3 }
+  },
+  "fish10": {
+    "name": "Fish 10",
+    "path": "assets/fish/player/fish10",
+    "unlock": { "type": "score", "value": 2200 }
+  },
+  "fish11": {
+    "name": "Fish 11",
+    "path": "assets/fish/player/fish11",
+    "unlock": { "type": "score", "value": 3000 }
+  },
+  "fish12": {
+    "name": "Fish 12",
+    "path": "assets/fish/player/fish12",
+    "unlock": { "type": "win_map", "mapId": 3 }
+  }
+}
