@@ -1,8 +1,19 @@
 import pygame
+import os
+
 
 class AnimatedSprite:
     def __init__(self, image_paths, fps=8):
-        self.frames = [pygame.image.load(p).convert_alpha() for p in image_paths]
+        self.frames = []
+
+        for p in image_paths:
+            # 🔥 ép path tuyệt đối theo project root
+            if not os.path.isabs(p):
+                p = os.path.join(os.getcwd(), p)
+
+            img = pygame.image.load(p).convert_alpha()
+            self.frames.append(img)
+
         self.fps = fps
         self.index = 0
         self.timer = 0.0
@@ -10,7 +21,7 @@ class AnimatedSprite:
 
         self.base_w = self.frames[0].get_width()
         self.base_h = self.frames[0].get_height()
-        self._cache = {}  # (idx,w,h,flip) -> surface
+        self._cache = {}
 
     def update(self, dt):
         self.timer += dt

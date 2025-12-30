@@ -100,10 +100,10 @@ class MapCard:
             overlay.fill((0, 0, 0, 140))
             screen.blit(overlay, (r.x, r.y))
 
-            lock = self.font_title.render("🔒 LOCKED", True, (255, 220, 120))
+            lock = self.font_title.render("🔒 Khóa", True, (255, 220, 120))
             screen.blit(lock, lock.get_rect(center=r.center))
 
-            hint = self.font_small.render(f"Win Map {map_id-1} to unlock", True, (255, 235, 170))
+            hint = self.font_small.render(f"Cần Win Map {map_id-1} để mở khóa", True, (255, 235, 170))
             screen.blit(hint, hint.get_rect(center=(r.centerx, r.centery + 28)))
 
 
@@ -161,7 +161,7 @@ class MapSelectScene(Scene):
 
         # back button (keep old button)
         theme = self.app.theme
-        self.btn_back = Button((30, 20, 120, 44), "BACK", self.app.back, self.btn_font, theme)
+        self.btn_back = Button((30, 20, 120, 44), "Trở lại", self.app.back, self.btn_font, theme)
 
         # tooltip
         self.tooltip = ""
@@ -217,7 +217,7 @@ class MapSelectScene(Scene):
             card.update(dt, mouse)
             if card.hit(mouse) and not card.unlocked:
                 map_id = int(card.map.get("id", 1))
-                self.tooltip = f"Win Map {map_id-1} to unlock this map."
+                self.tooltip = f"Cần chiến thắng bản đồ {map_id-1} để mở khóa bản đồ này."
                 self.tooltip_pos = (mouse[0] + 16, mouse[1] + 12)
 
     def _draw_tooltip(self, screen):
