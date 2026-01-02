@@ -1,0 +1,268 @@
+{
+  "coins": 0,
+  "unlocked_maps": [
+    1,
+    2,
+    3
+  ],
+  "unlocked_fish": [
+    "fish01",
+    "fish02",
+    "fish03",
+    "fish04",
+    "fish05",
+    "fish06",
+    "fish07",
+    "fish08",
+    "fish09",
+    "fish10",
+    "fish11",
+    "fish12"
+  ],
+  "selected_fish_p1": "fish09",
+  "selected_fish_p2": "fish06",
+  "highscores": {
+    "1": 3983,
+    "2": 3138,
+    "3": 5025
+  },
+  "history": [
+    {
+      "time": "2026-01-02 23:41:37",
+      "mode": 1,
+      "map_id": 2,
+      "points": 813,
+      "time_alive": 9.727000000000007,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 23:41:24",
+      "mode": 1,
+      "map_id": 1,
+      "points": 533,
+      "time_alive": 71.68200000000084,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 23:33:02",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 51.30199999999924,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 23:15:23",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 19.52399999999968,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 22:37:45",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 31.866999999998995,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 21:35:46",
+      "mode": 1,
+      "map_id": 1,
+      "points": 514,
+      "time_alive": 37.98200000000002,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 21:35:04",
+      "mode": 1,
+      "map_id": 1,
+      "points": 43,
+      "time_alive": 45.80499999999988,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 21:30:24",
+      "mode": 1,
+      "map_id": 1,
+      "points": 526,
+      "time_alive": 32.22500000000013,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 21:25:55",
+      "mode": 1,
+      "map_id": 1,
+      "points": 589,
+      "time_alive": 60.71099999999953,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 21:20:57",
+      "mode": 1,
+      "map_id": 1,
+      "points": 503,
+      "time_alive": 40.44099999999998,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 21:20:13",
+      "mode": 1,
+      "map_id": 1,
+      "points": 30,
+      "time_alive": 47.53599999999973,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:45:20",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 7.483999999999993,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:45:11",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 12.492000000000006,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:42:02",
+      "mode": 1,
+      "map_id": 3,
+      "points": 5,
+      "time_alive": 0.5710000000000001,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:41:51",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 0.559,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:41:46",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 0.567,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:41:43",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 7.279999999999997,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:38:27",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 12.815,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:35:31",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 0.5570000000000002,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:35:11",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 19.94400000000004,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:33:48",
+      "mode": 1,
+      "map_id": 1,
+      "points": 10,
+      "time_alive": 0.5630000000000001,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:33:41",
+      "mode": 1,
+      "map_id": 1,
+      "points": 10,
+      "time_alive": 5.623999999999996,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:30:06",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 10.967000000000006,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:24:32",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 12.38800000000001,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:18:31",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 0.5450000000000002,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 20:18:28",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 7.927999999999994,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 19:50:08",
+      "mode": 1,
+      "map_id": 1,
+      "points": 3983,
+      "time_alive": 0.575,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 19:49:36",
+      "mode": 1,
+      "map_id": 2,
+      "points": 3138,
+      "time_alive": 48.194999999999794,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 19:48:44",
+      "mode": 1,
+      "map_id": 1,
+      "points": 586,
+      "time_alive": 116.1130000000017,
+      "result": "WIN"
+    }
+  ],
+  "settings": {
+    "music": 0.6,
+    "sfx": 0.7,
+    "fullscreen": true
+  }
+}

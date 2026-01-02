@@ -1,0 +1,6 @@
+{
+  "id": 2,
+  "name": "Map 2 - Rạn san hô",
+  "bg": "assets/bg/map2_bg.jpg",
+  "world_size": [2880, 1612]
+}

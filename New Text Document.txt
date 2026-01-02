@@ -1,0 +1,195 @@
+FISHGAME-MAIN/
+│
+├── assets/
+│   └── Chứa toàn bộ tài nguyên của game
+│       - Hình ảnh (cá, nền, UI)
+│       - Âm thanh
+│       → KHÔNG chứa logic, chỉ dùng để load
+│
+├── data/
+│   │
+│   ├── maps/
+│   │   │
+│   │   ├── map1.json
+│   │   │   └── Dữ liệu map 1
+│   │   │       - Kích thước map
+│   │   │       - Vị trí spawn cá, chướng ngại
+│   │   │
+│   │   ├── map2.json
+│   │   │   └── Dữ liệu map 2 (độ khó cao hơn)
+│   │   │
+│   │   ├── map3.json
+│   │   │   └── Dữ liệu map 3 (map khó)
+│   │   │
+│   │   ├── fish_enemies.json
+│   │   │   └── Cấu hình cá địch
+│   │   │       - Loại cá
+│   │   │       - Tốc độ, kích thước
+│   │   │       - Điểm thưởng / nguy hiểm
+│   │   │
+│   │   ├── player_fish.json
+│   │   │   └── Cấu hình cá người chơi
+│   │   │       - Level cá
+│   │   │       - Scale, chỉ số
+│   │   │
+│   │   └── save.json
+│   │       └── File lưu tiến trình
+│   │           - Điểm cao
+│   │           - Lịch sử chơi
+│   │
+│
+├── src/
+│   │
+│   ├── core/
+│   │   │
+│   │   ├── assets.py
+│   │   │   └── Quản lý tài nguyên
+│   │   │       - Load hình ảnh
+│   │   │       - Cache asset dùng chung
+│   │   │
+│   │   ├── audio.py
+│   │   │   └── Quản lý âm thanh
+│   │   │       - Nhạc nền
+│   │   │       - Hiệu ứng ăn cá, thắng/thua
+│   │   │
+│   │   ├── game.py
+│   │   │   └── Lõi game
+│   │   │       - Vòng lặp chính (update, draw)
+│   │   │       - Điều khiển trạng thái game
+│   │   │
+│   │   ├── save.py
+│   │   │   └── Xử lý lưu/đọc dữ liệu
+│   │   │       - Ghi save.json
+│   │   │       - Load lịch sử chơi
+│   │   │
+│   │   ├── scene_manager.py
+│   │   │   └── Quản lý chuyển scene
+│   │   │       - Menu → Game → Game Over
+│   │   │
+│   │   ├── scene.py
+│   │   │   └── Lớp Scene cha
+│   │   │       - Các scene kế thừa từ đây
+│   │   │       - Chuẩn hoá update(), draw()
+│   │   │
+│   │   └── settings.py
+│   │       └── Cấu hình hệ thống
+│   │           - Kích thước màn hình
+│   │           - FPS
+│   │           - Các hằng số chung
+│   │
+│   ├── entities/
+│   │   │
+│   │   ├── animated_sprite.py
+│   │   │   └── Sprite có animation
+│   │   │       - Xử lý frame bơi của cá
+│   │   │
+│   │   ├── entity.py
+│   │   │   └── Lớp cha cho mọi đối tượng
+│   │   │       - Vị trí, vận tốc
+│   │   │       - Update cơ bản
+│   │   │
+│   │   ├── player.py
+│   │   │   └── Cá người chơi
+│   │   │       - Điều khiển di chuyển
+│   │   │       - Ăn cá, lớn lên
+│   │   │
+│   │   ├── ai_fish.py
+│   │   │   └── Cá AI
+│   │   │       - Hành vi tự động
+│   │   │       - Đuổi/tránh player
+│   │   │
+│   │   ├── prey.py
+│   │   │   └── Cá mồi
+│   │   │       - Bị ăn
+│   │   │       - Tăng điểm
+│   │   │
+│   │   ├── shy_prey.py
+│   │   │   └── Cá mồi nhút nhát
+│   │   │       - Né người chơi
+│   │   │
+│   │   ├── food.py
+│   │   │   └── Thức ăn trong map
+│   │   │
+│   │   ├── powerup.py
+│   │   │   └── Vật phẩm tăng sức mạnh
+│   │   │       - Tăng tốc
+│   │   │       - Bất tử tạm thời
+│   │   │
+│   │   ├── item_drop.py
+│   │   │   └── Cơ chế rơi vật phẩm
+│   │   │
+│   │   ├── obstacle.py
+│   │   │   └── Chướng ngại vật
+│   │   │
+│   │   └── floating_text.py
+│   │       └── Text nổi
+│   │           - Hiển thị +điểm
+│   │           - Hiệu ứng trực quan
+│   │
+│   ├── scenes/
+│   │   │
+│   │   ├── boot.py
+│   │   │   └── Scene khởi động game
+│   │   │
+│   │   ├── home.py
+│   │   │   └── Màn hình chính
+│   │   │
+│   │   ├── menu.py
+│   │   │   └── Menu lựa chọn
+│   │   │
+│   │   ├── fish_select.py
+│   │   │   └── Chọn cá người chơi
+│   │   │
+│   │   ├── map_select.py
+│   │   │   └── Chọn bản đồ
+│   │   │
+│   │   ├── mode_select.py
+│   │   │   └── Chọn chế độ chơi
+│   │   │
+│   │   ├── game_scene.py
+│   │   │   └── Scene chơi chính
+│   │   │
+│   │   ├── pause.py
+│   │   │   └── Tạm dừng game
+│   │   │
+│   │   ├── game_over.py
+│   │   │   └── Màn thua game
+│   │   │
+│   │   ├── victory.py
+│   │   │   └── Màn chiến thắng
+│   │   │
+│   │   ├── leaderboard.py
+│   │   │   └── Bảng xếp hạng
+│   │   │
+│   │   └── history.py
+│   │       └── Lịch sử chơi
+│   │
+│   ├── ui/
+│   │   │
+│   │   ├── bg.py
+│   │   │   └── Vẽ nền UI
+│   │   │
+│   │   ├── button.py
+│   │   │   └── Nút bấm
+│   │   │
+│   │   ├── panel.py
+│   │   │   └── Khung giao diện
+│   │   │
+│   │   └── hud.py
+│   │       └── Hiển thị điểm, máu, trạng thái
+│   │
+│   ├── world/
+│   │   │
+│   │   ├── camera.py
+│   │   │   └── Camera theo player
+│   │   │
+│   │   ├── spawner.py
+│   │   │   └── Sinh cá, vật phẩm
+│   │   │
+│   │   └── world.py
+│   │       └── Quản lý thế giới game
+│   │
+│   └── main.py
+│       └── Điểm vào chương trình
+│           - Gọi Game
+│           - Chạy ứng dụng
