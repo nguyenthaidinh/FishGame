@@ -1,5 +1,6 @@
 # src/scenes/game_scene.py
 import pygame
+from typing import List
 
 from src.core.scene import Scene
 from src.world.camera import Camera
@@ -11,7 +12,14 @@ from src.entities.item_drop import DropSpawner
 
 
 class GameScene(Scene):
-    TARGET_POINTS = 226
+    # =========================
+    # ĐIỂM QUA MÀN THEO MAP
+    # =========================
+    MAP_TARGETS = {
+        1: 500,   # Map 1
+        2: 3000,   # Map 2
+        3: 5000,   # Map 3
+    }
 
     # =========================
     # Enter
@@ -25,25 +33,37 @@ class GameScene(Scene):
             "name": "Map 1",
         }
         self.world_w, self.world_h = self.map["world_size"]
+        self.map_id = int(self.map.get("id", 1))
 
-        self.bg = self.app.assets.image(self.map["bg"]) if self.map.get("bg") else None
+        # điểm cần để qua map hiện tại
+        self.TARGET_POINTS = self.MAP_TARGETS.get(self.map_id, 300)
+
+        self.bg = (
+            self.app.assets.image(self.map["bg"])
+            if self.map.get("bg")
+            else None
+        )
 
         # ---------- Camera ----------
-        self.camera = Camera(self.app.w, self.app.h, self.world_w, self.world_h)
+        self.camera = Camera(
+            self.app.width,
+            self.app.height,
+            self.world_w,
+            self.world_h
+        )
 
         # ---------- Fonts + HUD ----------
         self.font_big = self.app.assets.font(None, 26)
         self.font_small = self.app.assets.font(None, 18)
         self.hud = HUD(self.font_big, self.font_small)
 
-        # ---------- Players ----------
-        p1_fish = self.app.save.data.get("selected_fish_p1", "fish01")
-        p2_fish = self.app.save.data.get("selected_fish_p2", "fish02")
+        # ==================================================
+        # PLAYERS (PERSISTENT – KHÔNG RESET)
+        # ==================================================
+        if "players" not in self.app.runtime:
+            p1_fish = self.app.save.data.get("selected_fish_p1", "fish01")
 
-        self.players: list[PlayerFish] = []
-
-        self.players.append(
-            PlayerFish(
+            player = PlayerFish(
                 pos=(self.world_w / 2, self.world_h / 2),
                 controls={
                     "up": pygame.K_w,
@@ -53,42 +73,30 @@ class GameScene(Scene):
                 },
                 fish_folder=f"assets/fish/player/{p1_fish}",
             )
-        )
-        self.players[0].points = 5
+            player.points = 5  # CHỈ SET 1 LẦN DUY NHẤT
 
-        if int(self.app.runtime.get("mode", 1)) == 2:
-            self.players.append(
-                PlayerFish(
-                    pos=(self.world_w / 2 + 120, self.world_h / 2),
-                    controls={
-                        "up": pygame.K_UP,
-                        "down": pygame.K_DOWN,
-                        "left": pygame.K_LEFT,
-                        "right": pygame.K_RIGHT,
-                    },
-                    fish_folder=f"assets/fish/player/{p2_fish}",
-                )
+            self.app.runtime["players"] = [player]
+
+        # dùng lại player cũ
+        self.players: List[PlayerFish] = self.app.runtime["players"]
+
+        # reset vị trí khi sang map (KHÔNG reset điểm / size)
+        for i, p in enumerate(self.players):
+            p.pos.update(
+                self.world_w / 2 + i * 120,
+                self.world_h / 2
             )
-            self.players[1].points = 5
 
         # ---------- Prey ----------
-        map_id = int(self.map.get("id", 1))
-        if map_id == 1:
-            prey_values = [2, 3, 5, 10, 15, 30, 50, 100]
-        elif map_id == 2:
-            prey_values = [3, 5, 10, 15, 30, 50, 100, 150]
-        else:
-            prey_values = [5, 10, 15, 30, 50, 100, 150, 200]
-
         self.preys = []
-        self.spawner = Spawner(self.world_w, self.world_h, prey_values)
+        self.spawner = Spawner(self.world_w, self.world_h)
 
         # ---------- Drops ----------
         self.drops = []
         self.drop_spawner = DropSpawner(self.world_w, self.world_h)
 
         # ---------- Misc ----------
-        self.floating: list[FloatingText] = []
+        self.floating: List[FloatingText] = []
         self.elapsed = 0.0
 
         self._status_icons = {
@@ -99,7 +107,7 @@ class GameScene(Scene):
             "heart": "assets/items/thuong.png",
         }
 
-        # ✅ (Optional) đảm bảo camera đúng ngay từ frame đầu (spawn không lệch)
+        # đảm bảo camera đúng từ frame đầu
         self.camera.follow(self.players[0].pos)
         self.camera.update(0.0)
 
@@ -123,13 +131,9 @@ class GameScene(Scene):
             p.pos.x = max(0, min(self.world_w, p.pos.x))
             p.pos.y = max(0, min(self.world_h, p.pos.y))
 
-        avg_pts = (
-            int((self.players[0].points + self.players[1].points) / 2)
-            if len(self.players) == 2
-            else int(self.players[0].points)
-        )
+        avg_pts = int(self.players[0].points)
 
-        # ✅ ---- Camera (PHẢI update trước khi spawn prey) ----
+        # ---- Camera ----
         self.camera.follow(self.players[0].pos)
         self.camera.update(dt)
 
@@ -141,12 +145,10 @@ class GameScene(Scene):
                 prey.update(dt, self.world_w, self.world_h)
 
         if len(self.preys) < 90:
-            map_id = int(self.map.get("id", 1))
-            self.spawner.update(dt, avg_pts, self.preys, self.camera, map_id=map_id)
+            self.spawner.update(dt, avg_pts, self.preys, self.camera, map_id=self.map_id)
 
         # ---- Drops ----
-        map_id = int(self.map.get("id", 1))
-        self.drop_spawner.update(dt, self.drops, map_id, avg_pts)
+        self.drop_spawner.update(dt, self.drops, self.map_id, avg_pts)
         for d in self.drops:
             d.update(dt, self.world_w, self.world_h)
 
@@ -165,17 +167,21 @@ class GameScene(Scene):
     # Collision helpers
     # =========================
     def _player_rect(self, p: PlayerFish) -> pygame.Rect:
-        r = 18 * float(getattr(p, "scale", 1.0))
-        return pygame.Rect(p.pos.x - r, p.pos.y - r, r * 2, r * 2)
+        img = p.sprite.get_image(scale=p.scale / p.render_div)
+        r = max(img.get_width(), img.get_height()) * 0.35
+        return pygame.Rect(
+            p.pos.x - r,
+            p.pos.y - r,
+            r * 2,
+            r * 2,
+        )
 
     def _handle_collisions(self):
         for p in self.players:
             p_rect = self._player_rect(p)
 
             for prey in self.preys:
-                if not prey.alive:
-                    continue
-                if not p_rect.colliderect(prey.rect()):
+                if not prey.alive or not p_rect.colliderect(prey.rect()):
                     continue
 
                 if prey.points <= int(p.points * 1.02):
@@ -187,9 +193,7 @@ class GameScene(Scene):
                     self.camera.shake(6, 0.15)
 
             for d in self.drops:
-                if not d.alive:
-                    continue
-                if not p_rect.colliderect(d.rect()):
+                if not d.alive or not p_rect.colliderect(d.rect()):
                     continue
 
                 d.alive = False
@@ -197,9 +201,8 @@ class GameScene(Scene):
                     p.hit()
                     self.camera.shake(8, 0.2)
                     self.floating.append(FloatingText(d.pos, "-1 ❤️"))
-                    continue
-
-                p.apply_item(d.kind)
+                else:
+                    p.apply_item(d.kind)
 
     # =========================
     # End conditions
@@ -209,7 +212,7 @@ class GameScene(Scene):
             from src.scenes.victory import VictoryScene
             self.app.scenes.set_scene(
                 VictoryScene(self.app),
-                map_id=int(self.map.get("id", 1)),
+                map_id=self.map_id,
                 points=int(self.players[0].points),
                 time_alive=float(self.elapsed),
             )
@@ -218,7 +221,7 @@ class GameScene(Scene):
             from src.scenes.game_over import GameOverScene
             self.app.scenes.set_scene(
                 GameOverScene(self.app),
-                map_id=int(self.map.get("id", 1)),
+                map_id=self.map_id,
                 points=int(self.players[0].points),
                 time_alive=float(self.elapsed),
             )
@@ -236,7 +239,6 @@ class GameScene(Scene):
         for d in self.drops:
             d.draw(screen, self.camera, self.app.assets)
 
-        # ✅ gọi đúng tham số (assets + font)
         for prey in self.preys:
             prey.draw(screen, self.camera, assets=self.app.assets, font=self.font_small)
 

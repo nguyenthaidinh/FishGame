@@ -47,24 +47,20 @@ class MapCard:
         return self.rect.collidepoint(pos)
 
     def draw(self, screen, selected=False):
-        # lifted rect for hover
         r = self.rect.copy()
         r.y -= int(self._lift)
 
-        # glow
         if self.hover > 0.01:
             glow = pygame.Surface((r.w + 20, r.h + 20), pygame.SRCALPHA)
             a = int(80 * self.hover)
             pygame.draw.rect(glow, (120, 200, 255, a), glow.get_rect(), border_radius=22)
             screen.blit(glow, (r.x - 10, r.y - 10))
 
-        # base card
         bg = (12, 24, 40)
         border = (120, 200, 255) if (selected or self.hover > 0.2) else (55, 85, 120)
         pygame.draw.rect(screen, bg, r, border_radius=18)
         pygame.draw.rect(screen, border, r, 2, border_radius=18)
 
-        # thumbnail (cropped center)
         thumb_rect = pygame.Rect(r.x + 12, r.y + 12, 140, r.h - 24)
         pygame.draw.rect(screen, (0, 0, 0), thumb_rect, border_radius=14)
 
@@ -77,7 +73,6 @@ class MapCard:
             y = thumb_rect.centery - nh // 2
             screen.blit(img, (x, y))
 
-        # title + info
         name = self.map.get("name", "Map")
         map_id = int(self.map.get("id", 1))
         wsize = self.map.get("world_size", [3000, 1800])
@@ -85,16 +80,16 @@ class MapCard:
         tx = r.x + 170
         ty = r.y + 22
 
-        title = self.font_title.render(name, True, (235, 245, 255))
-        screen.blit(title, (tx, ty))
+        screen.blit(self.font_title.render(name, True, (235, 245, 255)), (tx, ty))
+        screen.blit(
+            self.font_small.render(f"World: {wsize[0]} x {wsize[1]}", True, (190, 210, 235)),
+            (tx, ty + 34)
+        )
+        screen.blit(
+            self.font_small.render("Goal: 226 pts", True, (190, 210, 235)),
+            (tx, ty + 56)
+        )
 
-        info = self.font_small.render(f"World: {wsize[0]} x {wsize[1]}", True, (190, 210, 235))
-        screen.blit(info, (tx, ty + 34))
-
-        goal = self.font_small.render("Goal: 226 pts", True, (190, 210, 235))
-        screen.blit(goal, (tx, ty + 56))
-
-        # lock overlay
         if not self.unlocked:
             overlay = pygame.Surface((r.w, r.h), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 140))
@@ -103,7 +98,9 @@ class MapCard:
             lock = self.font_title.render("🔒 Khóa", True, (255, 220, 120))
             screen.blit(lock, lock.get_rect(center=r.center))
 
-            hint = self.font_small.render(f"Cần Win Map {map_id-1} để mở khóa", True, (255, 235, 170))
+            hint = self.font_small.render(
+                f"Cần Win Map {map_id-1} để mở khóa", True, (255, 235, 170)
+            )
             screen.blit(hint, hint.get_rect(center=(r.centerx, r.centery + 28)))
 
 
@@ -114,23 +111,18 @@ class MapSelectScene(Scene):
         self.font_small = self.app.assets.font(None, 18)
         self.btn_font = self.app.assets.font(None, 24)
 
-        # background UI
         self.bg = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
 
-        # click sound (optional)
-        self.click_sfx = None
         try:
             self.click_sfx = self.app.assets.sound("assets/sfx/ui_click.wav")
         except Exception:
             self.click_sfx = None
 
-        # load maps
         self.maps = []
         for i in [1, 2, 3]:
             with open(f"data/maps/map{i}.json", "r", encoding="utf-8") as f:
                 self.maps.append(json.load(f))
 
-        # load thumbs
         self.thumbs = {}
         for i in [1, 2, 3]:
             try:
@@ -138,8 +130,7 @@ class MapSelectScene(Scene):
             except Exception:
                 self.thumbs[i] = None
 
-        # build cards
-        cx = self.app.w // 2
+        cx = self.app.width// 2
         y0 = 240
         self.cards = []
 
@@ -159,14 +150,11 @@ class MapSelectScene(Scene):
                 )
             )
 
-        # back button (keep old button)
         theme = self.app.theme
         self.btn_back = Button((30, 20, 120, 44), "Trở lại", self.app.back, self.btn_font, theme)
 
-        # tooltip
         self.tooltip = ""
         self.tooltip_pos = (0, 0)
-
         self.selected_index = 0
 
     def _play_click(self):
@@ -177,8 +165,7 @@ class MapSelectScene(Scene):
                 pass
 
     def _start(self, map_data):
-        from src.scenes.fish_select import FishSelectScene 
-
+        from src.scenes.fish_select import FishSelectScene
         self._play_click()
         self.app.runtime["map"] = map_data
         self.app.scenes.set_scene(FishSelectScene(self.app))
@@ -194,7 +181,7 @@ class MapSelectScene(Scene):
                     if card.unlocked:
                         self._start(card.map)
                     else:
-                        self._play_click()  # vẫn click sound nhẹ
+                        self._play_click()
                     return
 
         if event.type == pygame.KEYDOWN:
@@ -228,32 +215,25 @@ class MapSelectScene(Scene):
         w = text.get_width() + pad * 2
         h = text.get_height() + pad * 2
         x, y = self.tooltip_pos
-        x = clamp(x, 10, self.app.w - w - 10)
-        y = clamp(y, 10, self.app.h - h - 10)
+        x = clamp(x, 10, self.app.width - w - 10)
+        y = clamp(y, 10, self.app.height - h - 10)
         box = pygame.Rect(x, y, w, h)
         pygame.draw.rect(screen, (0, 0, 0), box, border_radius=12)
         pygame.draw.rect(screen, (120, 200, 255), box, 2, border_radius=12)
         screen.blit(text, (x + pad, y + pad))
 
     def draw(self, screen):
-        # background cover
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
+        draw_cover(screen, self.bg, self.app.width, self.app.height)
 
-        # overlay
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        overlay = pygame.Surface((self.app.width, self.app.height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 95))
         screen.blit(overlay, (0, 0))
 
-        # title
         t = self.h1.render("Select Map", True, self.app.theme["text"])
         screen.blit(t, (70, 70))
 
-        # cards
         for i, card in enumerate(self.cards):
             card.draw(screen, selected=(i == self.selected_index))
 
-        # back
         self.btn_back.draw(screen)
-
-        # tooltip
         self._draw_tooltip(screen)

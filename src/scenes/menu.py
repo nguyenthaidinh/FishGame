@@ -1,83 +1,89 @@
 import pygame
 from src.core.scene import Scene
-from src.ui.button import Button
+from src.ui.image_button import ImageButton
 
 
-# =========================
-# Helpers
-# =========================
-def draw_cover(screen, image, w, h, alpha=255):
+def scale_cover(image, w, h):
     if image is None:
-        return
+        return None
+
     iw, ih = image.get_width(), image.get_height()
-    if iw <= 0 or ih <= 0:
-        return
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
-    surf = pygame.transform.smoothscale(image, (nw, nh))
-    if alpha < 255:
-        surf.set_alpha(alpha)
-    x = (w - nw) // 2
-    y = (h - nh) // 2
-    screen.blit(surf, (x, y))
+
+    return pygame.transform.smoothscale(image, (nw, nh))
 
 
-# =========================
-# MENU SCENE
-# =========================
 class MenuScene(Scene):
     def on_enter(self, **kwargs):
-        self.bg = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
+        # ===== BACKGROUND =====
+        bg_raw = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
+        self.bg = scale_cover(bg_raw, self.app.width, self.app.height)
 
+        # ===== FONTS =====
         self.title_font = self.app.assets.font(None, 64)
         self.sub_font = self.app.assets.font(None, 26)
-        self.btn_font = self.app.assets.font(None, 30)
 
-        cx = self.app.w // 2
-        y0 = 320
-        gap = 74
-        theme = self.app.theme
+        # ===== LAYOUT CHUẨN UI GAME =====
+        cx = self.app.width // 2
+        y0 = int(self.app.height * 0.38)   # menu hơi cao hơn trung tâm
 
+        gap = 90        # khoảng cách nút thường
+        exit_gap = 120  # EXIT cách xa hơn để tránh bấm nhầm
+
+        # ===== MENU BUTTONS =====
         self.buttons = [
-            Button(
-                rect=(cx - 190, y0 + 0 * gap, 380, 64),
-                text="CHƠI NGAY",
-                on_click=self._go_mode,
-                font=self.btn_font,
-                theme=theme
+            # START – NỔI BẬT
+            ImageButton(
+                "assets/ui/button/start.png",
+                (cx, y0),
+                self._go_mode,
+                scale=0.15,
+                hover_scale=1.18
             ),
-            Button(
-                rect=(cx - 190, y0 + 1 * gap, 380, 64),
-                text="BẢNG XẾP HẠNG",
-                on_click=self._go_leaderboard,
-                font=self.btn_font,
-                theme=theme
+
+            # RANKING
+            ImageButton(
+                "assets/ui/button/ranking.png",
+                (cx, y0 + gap),
+                self._go_leaderboard,
+                scale=0.15,
+                hover_scale=1.12
             ),
-            Button(
-                rect=(cx - 190, y0 + 2 * gap, 380, 64),
-                text="LỊCH SỬ",
-                on_click=self._go_history,
-                font=self.btn_font,
-                theme=theme
+
+            # HISTORY
+            ImageButton(
+                "assets/ui/button/history.png",
+                (cx, y0 + gap * 2),
+                self._go_history,
+                scale=0.15,
+                hover_scale=1.12
             ),
-            Button(
-                rect=(cx - 190, y0 + 3 * gap, 380, 64),
-                text="CÀI ĐẶT",
-                on_click=self._go_settings,
-                font=self.btn_font,
-                theme=theme
-            ),
-            Button(
-                rect=(cx - 190, y0 + 4 * gap, 380, 64),
-                text="THOÁT GAME",
-                on_click=self.app.quit,
-                font=self.btn_font,
-                theme=theme
+
+            # EXIT – TÁCH RIÊNG
+            ImageButton(
+                "assets/ui/button/exit.png",
+                (cx, y0 + gap * 3),
+                self.app.quit,
+                scale=0.15,
+                hover_scale=1.12,
+                
             ),
         ]
 
+        # ===== SOUND BUTTON – GÓC TRÁI =====
+        self.sound_button = ImageButton(
+            "assets/ui/button/sound.png",
+            (70, self.app.height - 90),
+            self.app.toggle_sound,
+            scale=0.11,
+            hover_scale=1.15,
+            alt_image_path="assets/ui/button/mute.png"
+        )
+        self.sound_button.use_alt = not self.app.sound_on
+
     # =========================
-    # Navigation (LAZY IMPORT)
+    # Navigation
     # =========================
     def _go_mode(self):
         from src.scenes.mode_select import ModeSelectScene
@@ -91,36 +97,52 @@ class MenuScene(Scene):
         from src.scenes.history import HistoryScene
         self.app.scenes.set_scene(HistoryScene(self.app))
 
-    def _go_settings(self):
-        from src.core.settings import SettingsScene
-        self.app.scenes.set_scene(SettingsScene(self.app))
-
     # =========================
-    # Events
+    # EVENTS
     # =========================
     def handle_event(self, event):
         for b in self.buttons:
             b.handle_event(event)
 
+        self.sound_button.handle_event(event)
+
+    def update(self, dt):
+        pass
+
     # =========================
-    # Draw
+    # DRAW
     # =========================
     def draw(self, screen):
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
+        # ===== BACKGROUND =====
+        screen.blit(
+            self.bg,
+            self.bg.get_rect(
+                center=(self.app.width // 2, self.app.height // 2)
+            )
+        )
 
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 95))
+        # ===== OVERLAY NHẸ =====
+        overlay = pygame.Surface(
+            (self.app.width, self.app.height), pygame.SRCALPHA
+        )
+        overlay.fill((0, 40, 80, 40))
         screen.blit(overlay, (0, 0))
 
-        title = self.title_font.render("Blue Ocean", True, self.app.theme["text"])
+        # ===== TITLE =====
+        title = self.title_font.render(
+            "Blue Ocean", True, self.app.theme["text"]
+        )
         subtitle = self.sub_font.render(
             "Một đại dương, một quy luật.",
             True,
             self.app.theme["muted"]
         )
 
-        screen.blit(title, title.get_rect(center=(self.app.w // 2, 160)))
-        screen.blit(subtitle, subtitle.get_rect(center=(self.app.w // 2, 210)))
+        screen.blit(title, title.get_rect(center=(self.app.width // 2, 150)))
+        screen.blit(subtitle, subtitle.get_rect(center=(self.app.width // 2, 200)))
 
+        # ===== BUTTONS =====
         for b in self.buttons:
             b.draw(screen)
+
+        self.sound_button.draw(screen)

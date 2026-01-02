@@ -41,7 +41,7 @@ class GameOverScene(Scene):
         )
         self.app.save.save()
 
-        cx = self.app.w // 2
+        cx = self.app.width // 2
         theme = self.app.theme
         self.btn_font = self.app.assets.font(None, 28)
 
@@ -103,22 +103,22 @@ class GameOverScene(Scene):
             b.handle_event(event)
 
     def draw(self, screen):
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
+        draw_cover(screen, self.bg, self.app.width, self.app.height)
 
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        overlay = pygame.Surface((self.app.width, self.app.height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 120))
         screen.blit(overlay, (0, 0))
 
         title = self.title_font.render("GAME OVER", True, (255, 140, 140))
-        screen.blit(title, title.get_rect(center=(self.app.w // 2, 170)))
+        screen.blit(title, title.get_rect(center=(self.app.width // 2, 170)))
 
         info1 = self.font.render(f"Map: {self.map_id}", True, (235, 245, 255))
         info2 = self.font.render(f"Points: {self.points}", True, (235, 245, 255))
         info3 = self.font.render(f"Time alive: {self.time_alive:.1f}s", True, (235, 245, 255))
 
-        screen.blit(info1, info1.get_rect(center=(self.app.w // 2, 260)))
-        screen.blit(info2, info2.get_rect(center=(self.app.w // 2, 295)))
-        screen.blit(info3, info3.get_rect(center=(self.app.w // 2, 330)))
+        screen.blit(info1, info1.get_rect(center=(self.app.width // 2, 260)))
+        screen.blit(info2, info2.get_rect(center=(self.app.width // 2, 295)))
+        screen.blit(info3, info3.get_rect(center=(self.app.width // 2, 330)))
 
         for b in self.buttons:
             b.draw(screen)

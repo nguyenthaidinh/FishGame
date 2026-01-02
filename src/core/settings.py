@@ -130,7 +130,8 @@ class SettingsScene(Scene):
         theme = self.app.theme
         self.btn_back = Button((30, 20, 140, 44), "BACK", self._go_menu, self.small, theme)
         self.btn_apply = Button(
-            (self.app.w // 2 - 160, 560, 320, 56),
+            (self.app.width
+ // 2 - 160, 560, 320, 56),
             "APPLY",
             self._apply,
             self.btn_font,
@@ -164,7 +165,9 @@ class SettingsScene(Scene):
         self.app.save.save()
 
         flags = pygame.FULLSCREEN if self.fullscreen else 0
-        self.app.screen = pygame.display.set_mode((self.app.w, self.app.h), flags)
+        self.app.screen = pygame.display.set_mode((self.app.width
+, self.app.height
+), flags)
 
         try:
             pygame.mixer.music.set_volume(self.music)
@@ -198,16 +201,21 @@ class SettingsScene(Scene):
     # Draw
     # =========================
     def draw(self, screen):
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
+        draw_cover(screen, self.bg, self.app.width
+, self.app.height
+)
 
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        overlay = pygame.Surface((self.app.width
+, self.app.height
+), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 105))
         screen.blit(overlay, (0, 0))
 
         title = self.h1.render("SETTINGS", True, self.app.theme["text"])
         screen.blit(title, (70, 70))
 
-        panel = pygame.Rect(70, 160, self.app.w - 140, 520)
+        panel = pygame.Rect(70, 160, self.app.width
+ - 140, 520)
         pygame.draw.rect(screen, (10, 20, 35), panel, border_radius=18)
         pygame.draw.rect(screen, (120, 200, 255), panel, 2, border_radius=18)
 
@@ -228,4 +236,5 @@ class SettingsScene(Scene):
 
         if self.toast:
             t = self.small.render(self.toast, True, (255, 235, 170))
-            screen.blit(t, t.get_rect(center=(self.app.w // 2, 640)))
+            screen.blit(t, t.get_rect(center=(self.app.width
+ // 2, 640)))

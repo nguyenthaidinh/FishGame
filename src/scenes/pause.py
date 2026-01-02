@@ -16,7 +16,7 @@ class PauseScene(Scene):
         self.btn_font = self.app.assets.font(None, 28)
         self.small = self.app.assets.font(None, 18)
 
-        cx = self.app.w // 2
+        cx = self.app.width // 2
         theme = self.app.theme
 
         # Panel trung tâm
@@ -111,7 +111,7 @@ class PauseScene(Scene):
         # gameplay phía sau (freeze frame)
         self.game_scene.draw(screen)
 
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        overlay = pygame.Surface((self.app.width , self.app.height ), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 140))
         screen.blit(overlay, (0, 0))
 
@@ -120,7 +120,7 @@ class PauseScene(Scene):
         title = self.h1.render("PAUSED", True, self.app.theme["text"])
         screen.blit(
             title,
-            title.get_rect(center=(self.app.w // 2, 220))
+            title.get_rect(center=(self.app.width // 2, 220))
         )
 
         hint = self.small.render(
@@ -130,5 +130,5 @@ class PauseScene(Scene):
         )
         screen.blit(
             hint,
-            hint.get_rect(center=(self.app.w // 2, 250))
+            hint.get_rect(center=(self.app.width // 2, 250))
         )

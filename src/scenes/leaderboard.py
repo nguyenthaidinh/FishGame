@@ -27,7 +27,6 @@ class LeaderboardScene(Scene):
         self.small = self.app.assets.font(None, 18)
         theme = self.app.theme
 
-        # ✅ BACK dùng lazy import
         self.btn_back = Button(
             (30, 20, 140, 44),
             "BACK",
@@ -44,23 +43,35 @@ class LeaderboardScene(Scene):
         ]
 
     def _go_menu(self):
-        from src.scenes.menu import MenuScene  # ✅ lazy import
+        from src.scenes.menu import MenuScene
         self.app.scenes.set_scene(MenuScene(self.app))
 
     def handle_event(self, event):
         self.btn_back.handle_event(event)
 
     def draw(self, screen):
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
+        draw_cover(screen, self.bg, self.app.width, self.app.height)
 
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        overlay = pygame.Surface(
+            (self.app.width, self.app.height),
+            pygame.SRCALPHA
+        )
         overlay.fill((0, 0, 0, 105))
         screen.blit(overlay, (0, 0))
 
-        title = self.h1.render("LEADERBOARD", True, self.app.theme["text"])
+        title = self.h1.render(
+            "LEADERBOARD",
+            True,
+            self.app.theme["text"]
+        )
         screen.blit(title, (70, 70))
 
-        panel = pygame.Rect(70, 170, self.app.w - 140, 430)
+        panel = pygame.Rect(
+            70,
+            170,
+            self.app.width - 140,
+            430
+        )
         pygame.draw.rect(screen, (10, 20, 35), panel, border_radius=18)
         pygame.draw.rect(screen, (120, 200, 255), panel, 2, border_radius=18)
 

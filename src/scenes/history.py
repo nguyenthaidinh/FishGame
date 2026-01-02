@@ -38,15 +38,20 @@ class HistoryScene(Scene):
             self.scroll = max(0, self.scroll)
 
     def draw(self, screen):
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        draw_cover(screen, self.bg, self.app.width
+, self.app.height
+)
+        overlay = pygame.Surface((self.app.width
+, self.app.height
+), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 105))
         screen.blit(overlay, (0, 0))
 
         title = self.h1.render("HISTORY", True, self.app.theme["text"])
         screen.blit(title, (70, 70))
 
-        panel = pygame.Rect(70, 170, self.app.w - 140, 470)
+        panel = pygame.Rect(70, 170, self.app.width
+ - 140, 470)
         pygame.draw.rect(screen, (10, 20, 35), panel, border_radius=18)
         pygame.draw.rect(screen, (120, 200, 255), panel, 2, border_radius=18)
 

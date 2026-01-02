@@ -10,40 +10,73 @@ class PlayerFish:
 
         self.speed = 280.0
 
-        # progression
+        # =========================
+        # PROGRESSION
+        # =========================
         self.points = 5
-        self.scale = 1.0
 
-        # lives + invincible
+        self.base_scale = 0.20      # scale logic ban đầu
+        self.scale = self.base_scale
+        self.render_div = 3.0       # thu nhỏ khi vẽ (ổn định hình)
+
+        # =========================
+        # LIFE + BUFFS
+        # =========================
         self.lives = 3
-        self.invincible = 0.0          # i-frames sau hit (blink ngắn)
-        self.invincible_time = 0.0     # bất tử từ thưởng (10/20/30s)
-        self.shield_tier = 0           # 0/1/2/3 -> HUD icon thuong1/2/3
-
-        # buffs
-        self.x2_time = 0.0             # x2 điểm theo thời gian
+        self.invincible = 0.0
+        self.invincible_time = 0.0
+        self.shield_tier = 0
+        self.x2_time = 0.0
 
         self.controls = controls
 
         self.sprite = AnimatedSprite(
-            [f"{fish_folder}/swim_01.png", f"{fish_folder}/swim_02.png"],
+            [
+                f"{fish_folder}/swim_01.png",
+                f"{fish_folder}/swim_02.png",
+            ],
             fps=8
         )
 
-    # ---------- SCORE ----------
+    # =========================
+    # SCORE
+    # =========================
     def add_points(self, pts: int) -> int:
-        """Cộng điểm, tự nhân 2 nếu đang x2. Trả về số điểm thực cộng."""
         mult = 2 if self.x2_time > 0 else 1
         gained = int(pts) * mult
         self.points += gained
         return gained
 
+    # =========================
+    # SCALE LOGIC (THEO GIAI ĐOẠN – KHÔNG CHẶN SIZE)
+    # =========================
     def _update_scale(self):
-        # 5 điểm ~1.0+, 226 điểm ~2.2 (xấp xỉ)
-        target = 1.0 + min(1.2, (self.points / 226.0) * 1.2)
-        self.scale += (target - self.scale) * 0.10  # smooth
+        """
+        Giai đoạn phát triển:
+        - 0 → 500 điểm     : lớn nhanh
+        - 500 → 1500 điểm  : lớn vừa
+        - > 1500 điểm      : lớn chậm (boss size)
+        """
 
-    # ---------- ITEMS ----------
+        if self.points < 500:
+            # giai đoạn đầu – lớn rõ
+            target = 0.20 + self.points * 0.002
+        elif self.points < 1500:
+            # giai đoạn giữa – lớn chậm lại
+            target = 1.20 + (self.points - 500) * 0.001
+        else:
+            # giai đoạn cao – chống vỡ màn hình
+            target = 2.20 + (self.points - 1500) * 0.0005
+
+        # clamp an toàn (vẫn cho rất to)
+        target = min(target, 4.5)
+
+        # mượt nhưng vẫn thấy lớn
+        self.scale += (target - self.scale) * 0.18
+
+    # =========================
+    # ITEMS
+    # =========================
     def apply_item(self, kind: str):
         if kind == "x2":
             self.x2_time = max(self.x2_time, 12.0)
@@ -63,15 +96,18 @@ class PlayerFish:
         elif kind == "heart":
             self.lives = min(3, self.lives + 1)
 
-    # ---------- DAMAGE ----------
+    # =========================
+    # DAMAGE
+    # =========================
     def hit(self):
-        # bất tử thưởng hoặc i-frames thì không trừ tiếp
         if self.invincible_time > 0 or self.invincible > 0:
             return
         self.lives -= 1
         self.invincible = 1.2
 
-    # ---------- UPDATE ----------
+    # =========================
+    # UPDATE
+    # =========================
     def update(self, dt):
         keys = pygame.key.get_pressed()
         self.vel.update(0, 0)
@@ -105,14 +141,18 @@ class PlayerFish:
         if self.x2_time > 0:
             self.x2_time -= dt
 
+        # update size
         self._update_scale()
+
         self.sprite.update(dt)
 
+    # =========================
+    # DRAW
+    # =========================
     def draw(self, screen, camera):
-        img = self.sprite.get_image(scale=self.scale)
+        img = self.sprite.get_image(scale=self.scale / self.render_div)
         rect = img.get_rect(center=camera.world_to_screen(self.pos))
 
-        # blink khi đang i-frames hoặc bất tử
         blink = (self.invincible > 0) or (self.invincible_time > 0)
         if blink and int((self.invincible + self.invincible_time) * 10) % 2 == 0:
             return

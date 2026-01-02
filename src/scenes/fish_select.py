@@ -43,6 +43,7 @@ class FishCard:
         self.sprite.update(dt)
         target = 1.0 if self.rect.collidepoint(mouse_pos) else 0.0
         self.hover += (target - self.hover) * min(1.0, dt * 10.0)
+        
 
     def hit(self, pos):
         return self.rect.collidepoint(pos)
@@ -117,7 +118,6 @@ class FishSelectScene(Scene):
         self.sel_p2 = self.app.save.data.get("selected_fish_p2", "fish02")
 
         self.active_player = 1
-
         self.max_map = self.app.save.progress_max_map()
         self.allowed = self.app.save.allowed_fish_count_by_progress()
 
@@ -126,7 +126,10 @@ class FishSelectScene(Scene):
         top = 190
         cols = 4
         gap = 18
-        card_w = (self.app.w - margin_x * 2 - gap * (cols - 1)) // cols
+
+        card_w = (
+            self.app.width - margin_x * 2 - gap * (cols - 1)
+        ) // cols
         card_h = 170
 
         for idx, (fish_id, meta) in enumerate(self.fish_db.items()):
@@ -139,11 +142,19 @@ class FishSelectScene(Scene):
             name = meta.get("name", fish_id)
             unlocked = self.app.save.is_unlocked_fish(fish_id)
 
-            self.cards.append(FishCard((x, y, card_w, card_h), fish_id, name, folder, unlocked))
+            self.cards.append(
+                FishCard((x, y, card_w, card_h), fish_id, name, folder, unlocked)
+            )
 
         theme = self.app.theme
         self.btn_back = Button((30, 20, 120, 44), "BACK", self.app.back, self.btn_font, theme)
-        self.btn_start = Button((self.app.w // 2 - 170, 670, 340, 56), "START", self._start, self.btn_font, theme)
+        self.btn_start = Button(
+            (self.app.width // 2 - 170, 670, 340, 56),
+            "START",
+            self._start,
+            self.btn_font,
+            theme
+        )
 
         self.toggle_p1 = pygame.Rect(70, 130, 140, 42)
         self.toggle_p2 = pygame.Rect(220, 130, 140, 42)
@@ -152,7 +163,7 @@ class FishSelectScene(Scene):
         self.tooltip_pos = (0, 0)
 
     def _start(self):
-        from src.scenes.game_scene import GameScene  # ✅ lazy import
+        from src.scenes.game_scene import GameScene
 
         self.app.save.data["selected_fish_p1"] = self.sel_p1
         if self.mode == 2:
@@ -167,11 +178,7 @@ class FishSelectScene(Scene):
 
         self.app.scenes.set_scene(GameScene(self.app), map_data=map_data)
 
-    # ====== rest giữ nguyên ======
-
-
     def _unlock_hint(self, fish_id: str) -> str:
-        # map1 -> 3 fish, map2 -> 8 fish, map3 -> 12 fish
         try:
             n = int(fish_id.replace("fish", ""))
         except Exception:
@@ -218,7 +225,6 @@ class FishSelectScene(Scene):
                 self.tooltip_pos = (mouse[0] + 16, mouse[1] + 12)
 
     def _draw_toggle(self, screen):
-        # panel
         pygame.draw.rect(screen, (10, 20, 35), (60, 118, 330, 56), border_radius=16)
         pygame.draw.rect(screen, (90, 150, 210), (60, 118, 330, 56), 2, border_radius=16)
 
@@ -244,8 +250,8 @@ class FishSelectScene(Scene):
         w = text.get_width() + pad * 2
         h = text.get_height() + pad * 2
         x, y = self.tooltip_pos
-        x = clamp(x, 10, self.app.w - w - 10)
-        y = clamp(y, 10, self.app.h - h - 10)
+        x = clamp(x, 10, self.app.width - w - 10)
+        y = clamp(y, 10, self.app.height - h - 10)
 
         box = pygame.Rect(x, y, w, h)
         pygame.draw.rect(screen, (0, 0, 0), box, border_radius=12)
@@ -253,9 +259,9 @@ class FishSelectScene(Scene):
         screen.blit(text, (x + pad, y + pad))
 
     def draw(self, screen):
-        # background + overlay
-        draw_cover(screen, self.bg, self.app.w, self.app.h)
-        overlay = pygame.Surface((self.app.w, self.app.h), pygame.SRCALPHA)
+        draw_cover(screen, self.bg, self.app.width, self.app.height)
+
+        overlay = pygame.Surface((self.app.width, self.app.height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 95))
         screen.blit(overlay, (0, 0))
 
@@ -273,10 +279,12 @@ class FishSelectScene(Scene):
 
         for card in self.cards:
             selected = (card.fish_id == self.sel_p1) or (self.mode == 2 and card.fish_id == self.sel_p2)
-            active = (self.mode == 2 and (
-                (self.active_player == 1 and card.fish_id == self.sel_p1) or
-                (self.active_player == 2 and card.fish_id == self.sel_p2)
-            ))
+            active = (
+                self.mode == 2 and (
+                    (self.active_player == 1 and card.fish_id == self.sel_p1) or
+                    (self.active_player == 2 and card.fish_id == self.sel_p2)
+                )
+            )
             subtitle = self._unlock_hint(card.fish_id)
             card.draw(screen, self.font, self.small, selected=selected, active=active, subtitle=subtitle)
 
