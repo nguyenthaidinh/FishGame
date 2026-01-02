@@ -4,7 +4,12 @@ from src.entities.animated_sprite import AnimatedSprite
 
 
 class PlayerFish:
-    def __init__(self, pos, controls, fish_folder):
+    def __init__(self, pos, controls, fish_folder, player_id=1):
+        # =========================
+        # ID (CHO 2 NGƯỜI CHƠI)
+        # =========================
+        self.player_id = player_id   # 👈 QUAN TRỌNG
+
         self.pos = pygame.Vector2(pos)
         self.vel = pygame.Vector2(0, 0)
 
@@ -15,9 +20,9 @@ class PlayerFish:
         # =========================
         self.points = 5
 
-        self.base_scale = 0.20      # scale logic ban đầu
+        self.base_scale = 0.20
         self.scale = self.base_scale
-        self.render_div = 3.0       # thu nhỏ khi vẽ (ổn định hình)
+        self.render_div = 3.0
 
         # =========================
         # LIFE + BUFFS
@@ -48,30 +53,17 @@ class PlayerFish:
         return gained
 
     # =========================
-    # SCALE LOGIC (THEO GIAI ĐOẠN – KHÔNG CHẶN SIZE)
+    # SCALE LOGIC
     # =========================
     def _update_scale(self):
-        """
-        Giai đoạn phát triển:
-        - 0 → 500 điểm     : lớn nhanh
-        - 500 → 1500 điểm  : lớn vừa
-        - > 1500 điểm      : lớn chậm (boss size)
-        """
-
         if self.points < 500:
-            # giai đoạn đầu – lớn rõ
             target = 0.20 + self.points * 0.002
         elif self.points < 1500:
-            # giai đoạn giữa – lớn chậm lại
             target = 1.20 + (self.points - 500) * 0.001
         else:
-            # giai đoạn cao – chống vỡ màn hình
             target = 2.20 + (self.points - 1500) * 0.0005
 
-        # clamp an toàn (vẫn cho rất to)
         target = min(target, 4.5)
-
-        # mượt nhưng vẫn thấy lớn
         self.scale += (target - self.scale) * 0.18
 
     # =========================
@@ -141,9 +133,7 @@ class PlayerFish:
         if self.x2_time > 0:
             self.x2_time -= dt
 
-        # update size
         self._update_scale()
-
         self.sprite.update(dt)
 
     # =========================

@@ -1,7 +1,7 @@
 import json
 import pygame
 from src.core.scene import Scene
-from src.ui.button import Button
+from src.ui.image_button import ImageButton
 
 
 # =========================
@@ -25,10 +25,6 @@ def draw_cover(screen, image, w, h, alpha=255):
     x = (w - nw) // 2
     y = (h - nh) // 2
     screen.blit(surf, (x, y))
-
-
-def clamp(x, a, b):
-    return a if x < a else b if x > b else x
 
 
 # =========================
@@ -67,13 +63,11 @@ class MapCard:
             )
             screen.blit(glow, (r.x - 10, r.y - 10))
 
-        # card
         bg_color = (12, 26, 46)
         border = (120, 200, 255) if (selected or self.hover > 0.2) else (60, 90, 130)
         pygame.draw.rect(screen, bg_color, r, border_radius=18)
         pygame.draw.rect(screen, border, r, 2, border_radius=18)
 
-        # thumbnail
         thumb_rect = pygame.Rect(r.x + 12, r.y + 12, 140, r.h - 24)
         pygame.draw.rect(screen, (0, 0, 0), thumb_rect, border_radius=14)
 
@@ -88,7 +82,6 @@ class MapCard:
                  thumb_rect.centery - nh // 2)
             )
 
-        # text
         name = self.map.get("name", "Map")
         wsize = self.map.get("world_size", [3000, 1800])
 
@@ -125,7 +118,6 @@ class MapSelectScene(Scene):
         self.h1 = self.app.assets.font(FONT_PATH, 46)
         self.font_card = self.app.assets.font(FONT_PATH, 26)
         self.font_small = self.app.assets.font(FONT_PATH, 18)
-        self.btn_font = self.app.assets.font(FONT_PATH, 22)
 
         # ===== BACKGROUND =====
         self.bg = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
@@ -162,17 +154,23 @@ class MapSelectScene(Scene):
                 )
             )
 
-        # ===== BACK BUTTON =====
-        theme = self.app.theme
-        self.btn_back = Button(
-            (30, 20, 120, 44),
-            "BACK",
-            self.app.back,
-            self.btn_font,
-            theme
+        # ===== BACK IMAGE BUTTON =====
+        self.btn_back = ImageButton(
+            "assets/ui/button/back.png",
+            (70, 50),
+            self._go_back,
+            scale=0.12,
+            hover_scale=1.15
         )
 
         self.selected_index = 0
+
+    # =========================
+    # BACK
+    # =========================
+    def _go_back(self):
+        from src.scenes.mode_select import ModeSelectScene
+        self.app.scenes.set_scene(ModeSelectScene(self.app))
 
     # =========================
     # EVENTS

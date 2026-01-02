@@ -121,7 +121,7 @@ class FishSelectScene(Scene):
         self.btn_back = ImageButton(
             "assets/ui/button/back.png",
             (80, 50),
-            self.app.back,
+            self._go_back,
             scale=0.12,
             hover_scale=1.15
         )
@@ -152,6 +152,10 @@ class FishSelectScene(Scene):
             self.app.runtime["map"] = map_data
 
         self.app.scenes.set_scene(GameScene(self.app), map_data=map_data)
+    def _go_back(self):
+        from src.scenes.map_select import MapSelectScene
+        self.app.scenes.set_scene(MapSelectScene(self.app))
+
 
     # =========================
     # Events

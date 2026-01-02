@@ -23,6 +23,7 @@ class GameScene(Scene):
     # Enter
     # =========================
     def on_enter(self, map_data=None, **kwargs):
+        # ---------- MAP ----------
         self.map = map_data or {
             "id": 1,
             "bg": None,
@@ -40,7 +41,7 @@ class GameScene(Scene):
             else None
         )
 
-        # ===== Camera =====
+        # ---------- CAMERA ----------
         self.camera = Camera(
             self.app.width,
             self.app.height,
@@ -48,17 +49,57 @@ class GameScene(Scene):
             self.world_h
         )
 
-        # ===== Fonts + HUD =====
+        # ---------- HUD ----------
         self.font_big = self.app.assets.font(None, 26)
         self.font_small = self.app.assets.font(None, 18)
         self.hud = HUD(self.font_big, self.font_small)
 
-        # ===== Player (persistent) =====
-        if "players" not in self.app.runtime:
+        # ---------- PLAYER MODE ----------
+        mode = self.app.runtime.get("mode", 1)
+
+        self.players: List[PlayerFish] = []
+
+        if mode == 2:
+            # ===== PLAYER 1 =====
             p1_fish = self.app.save.data.get(
                 "selected_fish_p1", "fish01"
             )
-            player = PlayerFish(
+            p1 = PlayerFish(
+                pos=(self.world_w / 2 - 80, self.world_h / 2),
+                controls={
+                    "up": pygame.K_w,
+                    "down": pygame.K_s,
+                    "left": pygame.K_a,
+                    "right": pygame.K_d,
+                },
+                fish_folder=f"assets/fish/player/{p1_fish}",
+                player_id=1
+            )
+
+            # ===== PLAYER 2 =====
+            p2_fish = self.app.save.data.get(
+                "selected_fish_p2", "fish02"
+            )
+            p2 = PlayerFish(
+                pos=(self.world_w / 2 + 80, self.world_h / 2),
+                controls={
+                    "up": pygame.K_UP,
+                    "down": pygame.K_DOWN,
+                    "left": pygame.K_LEFT,
+                    "right": pygame.K_RIGHT,
+                },
+                fish_folder=f"assets/fish/player/{p2_fish}",
+                player_id=2
+            )
+
+            self.players = [p1, p2]
+
+        else:
+            # ===== SINGLE PLAYER =====
+            p1_fish = self.app.save.data.get(
+                "selected_fish_p1", "fish01"
+            )
+            p1 = PlayerFish(
                 pos=(self.world_w / 2, self.world_h / 2),
                 controls={
                     "up": pygame.K_w,
@@ -67,19 +108,13 @@ class GameScene(Scene):
                     "right": pygame.K_d,
                 },
                 fish_folder=f"assets/fish/player/{p1_fish}",
+                player_id=1
             )
-            player.points = 5
-            self.app.runtime["players"] = [player]
+            self.players = [p1]
 
-        self.players: List[PlayerFish] = self.app.runtime["players"]
+        self.app.runtime["players"] = self.players
 
-        for i, p in enumerate(self.players):
-            p.pos.update(
-                self.world_w / 2 + i * 120,
-                self.world_h / 2
-            )
-
-        # ===== Enemies / Drops =====
+        # ---------- ENEMIES / DROPS ----------
         self.preys = []
         self.spawner = Spawner(self.world_w, self.world_h)
 
@@ -89,16 +124,17 @@ class GameScene(Scene):
         self.floating: List[FloatingText] = []
         self.elapsed = 0.0
 
+        # ---------- CAMERA START ----------
         self.camera.follow(self.players[0].pos)
         self.camera.update(0.0)
 
-        # ===== BGM =====
+        # ---------- BGM ----------
         if self.app.sound_on:
             pygame.mixer.music.load("assets/sound/bgm_game.mp3")
             pygame.mixer.music.set_volume(0.35)
             pygame.mixer.music.play(-1)
 
-        # ===== Pause Button =====
+        # ---------- PAUSE BUTTON ----------
         self.btn_pause = ImageButton(
             "assets/ui/button/pause.png",
             (self.app.width - 42, 32),
@@ -121,7 +157,6 @@ class GameScene(Scene):
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             self._pause_game()
-
         self.btn_pause.handle_event(event)
 
     # =========================
@@ -135,9 +170,15 @@ class GameScene(Scene):
             p.pos.x = max(0, min(self.world_w, p.pos.x))
             p.pos.y = max(0, min(self.world_h, p.pos.y))
 
-        avg_pts = int(self.players[0].points)
+        avg_pts = int(sum(p.points for p in self.players) / len(self.players))
 
-        self.camera.follow(self.players[0].pos)
+        # CAMERA FOLLOW
+        if len(self.players) == 2:
+            center = (self.players[0].pos + self.players[1].pos) / 2
+            self.camera.follow(center)
+        else:
+            self.camera.follow(self.players[0].pos)
+
         self.camera.update(dt)
 
         for prey in self.preys:
@@ -178,7 +219,7 @@ class GameScene(Scene):
                         prey.alive = False
                         gained = p.add_points(prey.points)
                         self.floating.append(
-                            FloatingText(prey.pos, f"+{gained}")
+                            FloatingText(prey.pos, f"P{p.player_id} +{gained}")
                         )
                     else:
                         p.hit()
@@ -197,25 +238,28 @@ class GameScene(Scene):
     # End game
     # =========================
     def _check_end_conditions(self):
-        if self.players[0].points >= self.TARGET_POINTS:
-            pygame.mixer.music.fadeout(800)
-            from src.scenes.victory import VictoryScene
-            self.app.scenes.set_scene(
-                VictoryScene(self.app),
-                map_id=self.map_id,
-                points=int(self.players[0].points),
-                time_alive=self.elapsed,
-            )
+        for p in self.players:
+            if p.points >= self.TARGET_POINTS:
+                pygame.mixer.music.fadeout(800)
+                from src.scenes.victory import VictoryScene
+                self.app.scenes.set_scene(
+                    VictoryScene(self.app),
+                    map_id=self.map_id,
+                    points=int(p.points),
+                    time_alive=self.elapsed,
+                )
+                return
 
-        if self.players[0].lives <= 0:
-            pygame.mixer.music.fadeout(800)
-            from src.scenes.game_over import GameOverScene
-            self.app.scenes.set_scene(
-                GameOverScene(self.app),
-                map_id=self.map_id,
-                points=int(self.players[0].points),
-                time_alive=self.elapsed,
-            )
+            if p.lives <= 0:
+                pygame.mixer.music.fadeout(800)
+                from src.scenes.game_over import GameOverScene
+                self.app.scenes.set_scene(
+                    GameOverScene(self.app),
+                    map_id=self.map_id,
+                    points=int(p.points),
+                    time_alive=self.elapsed,
+                )
+                return
 
     # =========================
     # Draw
@@ -244,7 +288,7 @@ class GameScene(Scene):
         for ft in self.floating:
             ft.draw(screen, self.camera, self.font_small)
 
-        # ===== HUD =====
+        # ===== HUD (HIỆN PLAYER 1) =====
         self.hud.draw(
             screen,
             assets=self.app.assets,
@@ -256,5 +300,4 @@ class GameScene(Scene):
             map_name=self.map.get("name", ""),
         )
 
-        # ===== PAUSE BUTTON (TRÊN HUD) =====
         self.btn_pause.draw(screen)
