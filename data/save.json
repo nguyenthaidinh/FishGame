@@ -28,6 +28,46 @@
   },
   "history": [
     {
+      "time": "2026-01-03 04:24:19",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 8.105000000000036,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 04:18:14",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 3.761999999999994,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 04:18:08",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 9.020000000000017,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 04:15:34",
+      "mode": 1,
+      "map_id": 1,
+      "points": 15,
+      "time_alive": 9.901000000000009,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 04:15:21",
+      "mode": 1,
+      "map_id": 1,
+      "points": 33,
+      "time_alive": 19.516999999999715,
+      "result": "LOSE"
+    },
+    {
       "time": "2026-01-03 03:51:48",
       "mode": 1,
       "map_id": 1,
