@@ -16,7 +16,7 @@ class GameScene(Scene):
     # ĐIỂM QUA MÀN THEO MAP
     # =========================
     MAP_TARGETS = {
-        1: 500,   # Map 1
+        1: 500,    # Map 1
         2: 3000,   # Map 2
         3: 5000,   # Map 3
     }
@@ -35,7 +35,7 @@ class GameScene(Scene):
         self.world_w, self.world_h = self.map["world_size"]
         self.map_id = int(self.map.get("id", 1))
 
-        # điểm cần để qua map hiện tại
+        # điểm cần để qua map
         self.TARGET_POINTS = self.MAP_TARGETS.get(self.map_id, 300)
 
         self.bg = (
@@ -77,7 +77,6 @@ class GameScene(Scene):
 
             self.app.runtime["players"] = [player]
 
-        # dùng lại player cũ
         self.players: List[PlayerFish] = self.app.runtime["players"]
 
         # reset vị trí khi sang map (KHÔNG reset điểm / size)
@@ -107,15 +106,26 @@ class GameScene(Scene):
             "heart": "assets/items/thuong.png",
         }
 
-        # đảm bảo camera đúng từ frame đầu
+        # camera init
         self.camera.follow(self.players[0].pos)
         self.camera.update(0.0)
+
+        # ==================================================
+        # 🎵 GAMEPLAY BGM
+        # ==================================================
+        if self.app.sound_on:
+            pygame.mixer.music.load(
+                "assets/sound/bgm_game.mp3"
+            )
+            pygame.mixer.music.set_volume(0.35)
+            pygame.mixer.music.play(-1)  # loop vô hạn
 
     # =========================
     # Events
     # =========================
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            pygame.mixer.music.fadeout(500)
             from src.scenes.pause import PauseScene
             self.app.scenes.set_scene(PauseScene(self.app, self))
 
@@ -145,7 +155,9 @@ class GameScene(Scene):
                 prey.update(dt, self.world_w, self.world_h)
 
         if len(self.preys) < 90:
-            self.spawner.update(dt, avg_pts, self.preys, self.camera, map_id=self.map_id)
+            self.spawner.update(
+                dt, avg_pts, self.preys, self.camera, map_id=self.map_id
+            )
 
         # ---- Drops ----
         self.drop_spawner.update(dt, self.drops, self.map_id, avg_pts)
@@ -187,7 +199,9 @@ class GameScene(Scene):
                 if prey.points <= int(p.points * 1.02):
                     prey.alive = False
                     gained = p.add_points(prey.points)
-                    self.floating.append(FloatingText(prey.pos, f"+{gained}"))
+                    self.floating.append(
+                        FloatingText(prey.pos, f"+{gained}")
+                    )
                 else:
                     p.hit()
                     self.camera.shake(6, 0.15)
@@ -200,7 +214,9 @@ class GameScene(Scene):
                 if str(d.kind).startswith("ob"):
                     p.hit()
                     self.camera.shake(8, 0.2)
-                    self.floating.append(FloatingText(d.pos, "-1 ❤️"))
+                    self.floating.append(
+                        FloatingText(d.pos, "-1 ❤️")
+                    )
                 else:
                     p.apply_item(d.kind)
 
@@ -209,6 +225,7 @@ class GameScene(Scene):
     # =========================
     def _check_end_conditions(self):
         if self.players[0].points >= self.TARGET_POINTS:
+            pygame.mixer.music.fadeout(800)
             from src.scenes.victory import VictoryScene
             self.app.scenes.set_scene(
                 VictoryScene(self.app),
@@ -218,6 +235,7 @@ class GameScene(Scene):
             )
 
         if self.players[0].lives <= 0:
+            pygame.mixer.music.fadeout(800)
             from src.scenes.game_over import GameOverScene
             self.app.scenes.set_scene(
                 GameOverScene(self.app),
@@ -233,20 +251,37 @@ class GameScene(Scene):
         screen.fill((8, 30, 55))
 
         if self.bg:
-            bg = pygame.transform.smoothscale(self.bg, (self.world_w, self.world_h))
-            screen.blit(bg, (-self.camera.offset.x, -self.camera.offset.y))
+            bg = pygame.transform.smoothscale(
+                self.bg, (self.world_w, self.world_h)
+            )
+            screen.blit(
+                bg,
+                (-self.camera.offset.x, -self.camera.offset.y)
+            )
 
         for d in self.drops:
             d.draw(screen, self.camera, self.app.assets)
 
         for prey in self.preys:
-            prey.draw(screen, self.camera, assets=self.app.assets, font=self.font_small)
+            prey.draw(
+                screen,
+                self.camera,
+                assets=self.app.assets,
+                font=self.font_small
+            )
 
         for p in self.players:
             p.draw(screen, self.camera)
             pos = self.camera.world_to_screen(p.pos)
-            label = self.font_small.render(str(p.points), True, (255, 255, 255))
-            screen.blit(label, label.get_rect(center=(int(pos.x), int(pos.y - 34))))
+            label = self.font_small.render(
+                str(p.points), True, (255, 255, 255)
+            )
+            screen.blit(
+                label,
+                label.get_rect(
+                    center=(int(pos.x), int(pos.y - 34))
+                )
+            )
 
         for ft in self.floating:
             ft.draw(screen, self.camera, self.font_small)

@@ -4,10 +4,35 @@ from src.ui.image_button import ImageButton
 from src.scenes.map_select import MapSelectScene
 
 
+# =========================
+# Helpers
+# =========================
+def scale_cover(image, w, h):
+    """
+    Scale ảnh nền kiểu cover:
+    - Phủ kín toàn bộ màn hình
+    - Giữ đúng tỉ lệ ảnh
+    """
+    iw, ih = image.get_width(), image.get_height()
+    scale = max(w / iw, h / ih)
+    nw, nh = int(iw * scale), int(ih * scale)
+    return pygame.transform.smoothscale(image, (nw, nh))
+
+
+# =========================
+# MODE SELECT SCENE
+# =========================
 class ModeSelectScene(Scene):
     def on_enter(self, **kwargs):
-        # ===== FONT (CHỈ DÙNG CHO TITLE) =====
-        self.h1 = self.app.assets.font(None, 46)
+        # ===== BACKGROUND =====
+        # (có thể dùng chung ảnh với menu chính)
+        bg_raw = self.app.assets.image("assets/bg/mode_bg.png")
+        self.bg = scale_cover(bg_raw, self.app.width, self.app.height)
+
+        # ===== FONT (TITLE) =====
+        self.h1 = self.app.assets.font(
+            "assets/fonts/Fredoka-Bold.ttf", 46
+        )
 
         # ===== CLICK SOUND =====
         self.click_sound = self.app.assets.sound(
@@ -27,7 +52,7 @@ class ModeSelectScene(Scene):
                 (cx, y0),
                 lambda: self._pick(1),
                 scale=0.22,
-                scale_x=1.5,        # ⭐ KÉO DÀI NGANG
+                scale_x=1.5,
                 scale_y=1.0,
                 hover_scale=1.15,
                 click_sound=self.click_sound
@@ -36,7 +61,7 @@ class ModeSelectScene(Scene):
             # ===== 2 PLAYERS =====
             ImageButton(
                 "assets/ui/button/2_player.png",
-                (cx, y0 + gap*1.5),
+                (cx, y0 + gap * 1.5),
                 lambda: self._pick(2),
                 scale=0.22,
                 scale_x=1.5,
@@ -80,17 +105,29 @@ class ModeSelectScene(Scene):
     # =========================
     def draw(self, screen):
         # ===== BACKGROUND =====
-        screen.fill((6, 22, 44))  # nền xanh đậm đồng bộ menu
+        screen.blit(
+            self.bg,
+            self.bg.get_rect(
+                center=(self.app.width // 2, self.app.height // 2)
+            )
+        )
+
+        # ===== OVERLAY NHẸ (CHO NÚT NỔI) =====
+        overlay = pygame.Surface(
+            (self.app.width, self.app.height), pygame.SRCALPHA
+        )
+        overlay.fill((0, 30, 60, 70))  # xanh đậm mờ
+        screen.blit(overlay, (0, 0))
 
         # ===== TITLE =====
-        t = self.h1.render(
+        title = self.h1.render(
             "Select Mode",
             True,
             self.app.theme["text"]
         )
         screen.blit(
-            t,
-            t.get_rect(center=(self.app.width // 2, 220))
+            title,
+            title.get_rect(center=(self.app.width // 2, 220))
         )
 
         # ===== BUTTONS =====

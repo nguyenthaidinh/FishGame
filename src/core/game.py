@@ -85,6 +85,10 @@ class GameApp:
 
     def toggle_sound(self):
         self.set_sound(not self.sound_on)
+        if self.sound_on:
+            pygame.mixer.music.set_volume(0.4)
+        else:
+            pygame.mixer.music.set_volume(0.0)
 
     # ==================================================
     # BACK NAVIGATION
