@@ -1,65 +1,68 @@
 {
   "map1": [
-    { "id": "fish01", "path": "assets/fish/enemies/map1/fish01", "size": 80, "points": 80, "speed": 110, "ai": "wander", "can_eat_player": false },
+    { "id": "fish02", "path": "assets/fish/enemies/map1/fish02", "points": 5, "speed": 120, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 80, "weight": 14 },
+    { "id": "fish03", "path": "assets/fish/enemies/map1/fish03", "points": 5, "speed": 130, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 80, "weight": 14 },
+    { "id": "fish12", "path": "assets/fish/enemies/map1/fish05", "points": 5, "speed": 140, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 80, "weight": 12 },
+    { "id": "hippocampus01", "path": "assets/fish/enemies/map1/hippocampus01", "points": 8, "speed": 115, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 100, "weight": 10 },
 
-    { "id": "fish02", "path": "assets/fish/enemies/map1/fish02", "size": 20, "points": 5, "speed": 120, "ai": "wander", "can_eat_player": false },
-    { "id": "fish03", "path": "assets/fish/enemies/map1/fish03", "size": 20, "points": 5, "speed": 130, "ai": "wander", "can_eat_player": false },
-    { "id": "fish04", "path": "assets/fish/enemies/map1/fish04", "size": 60, "points": 40, "speed": 135, "ai": "wander", "can_eat_player": false },
-    { "id": "fish12", "path": "assets/fish/enemies/map1/fish05", "size": 20, "points": 5, "speed": 140, "ai": "wander", "can_eat_player": false },
+    { "id": "fish04", "path": "assets/fish/enemies/map1/fish04", "points": 40, "speed": 135, "ai": "dart", "role": "prey", "min_pp": 25, "max_pp": 160, "weight": 8 },
+    { "id": "fish01", "path": "assets/fish/enemies/map1/fish01", "points": 80, "speed": 110, "ai": "shy", "role": "prey", "min_pp": 60, "max_pp": 220, "weight": 6 },
 
-    { "id": "fish06", "path": "assets/fish/enemies/map1/fish06", "size": 30, "points": 30, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "fish07", "path": "assets/fish/enemies/map1/fish07", "size": 20, "points": 5, "speed": 155, "ai": "predator", "can_eat_player": true },
-    { "id": "fish08", "path": "assets/fish/enemies/map1/fish08", "size": 50, "points": 50, "speed": 160, "ai": "predator", "can_eat_player": true },
-    { "id": "fish09", "path": "assets/fish/enemies/map1/fish09", "size": 60, "points": 60, "speed": 165, "ai": "predator", "can_eat_player": true },
+    { "id": "fish06", "path": "assets/fish/enemies/map1/fish06", "points": 30, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 70, "max_pp": 160, "weight": 4 },
+    { "id": "fish07", "path": "assets/fish/enemies/map1/fish07", "points": 5, "speed": 155, "ai": "predator", "role": "predator", "min_pp": 80, "max_pp": 180, "weight": 3 },
 
-    { "id": "fish10", "path": "assets/fish/enemies/map1/fish10", "size": 70, "points": 70, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "fish11", "path": "assets/fish/enemies/map1/fish11", "size": 80, "points": 80, "speed": 140, "ai": "predator", "can_eat_player": true },
-    { "id": "fish05", "path": "assets/fish/enemies/map1/fish12", "size": 90, "points":90, "speed": 130, "ai": "predator", "can_eat_player": true },
+    { "id": "fish08", "path": "assets/fish/enemies/map1/fish08", "points": 50, "speed": 160, "ai": "predator", "role": "predator", "min_pp": 120, "max_pp": 260, "weight": 3 },
+    { "id": "fish09", "path": "assets/fish/enemies/map1/fish09", "points": 60, "speed": 165, "ai": "predator", "role": "predator", "min_pp": 140, "max_pp": 300, "weight": 2 },
 
-    { "id": "hippocampus01", "path": "assets/fish/enemies/map1/hippocampus01", "size": 30, "points": 8, "speed": 115, "ai": "wander", "can_eat_player": false },
-    { "id": "squid01", "path": "assets/fish/enemies/map1/squid01", "size": 30, "points": 40, "speed": 145, "ai": "predator", "can_eat_player": true },
-    { "id": "turtle01", "path": "assets/fish/enemies/map1/turtle01", "size": 44, "points": 90, "speed": 90, "ai": "predator", "can_eat_player": true }
+    { "id": "fish10", "path": "assets/fish/enemies/map1/fish10", "points": 70, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 180, "max_pp": 999, "weight": 2 },
+    { "id": "fish11", "path": "assets/fish/enemies/map1/fish11", "points": 80, "speed": 140, "ai": "predator", "role": "predator", "min_pp": 200, "max_pp": 999, "weight": 1 },
+    { "id": "fish05", "path": "assets/fish/enemies/map1/fish12", "points": 90, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 240, "max_pp": 999, "weight": 1 },
+
+    { "id": "squid01", "path": "assets/fish/enemies/map1/squid01", "points": 40, "speed": 145, "ai": "predator", "role": "predator", "min_pp": 110, "max_pp": 999, "weight": 2 },
+    { "id": "turtle01", "path": "assets/fish/enemies/map1/turtle01", "points": 90, "speed": 90, "ai": "predator", "role": "predator", "min_pp": 210, "max_pp": 999, "weight": 1 }
   ],
 
   "map2": [
-    { "id": "fish01", "path": "assets/fish/enemies/map2/fish01", "size": 50, "points": 10, "speed": 120, "ai": "wander", "can_eat_player": false },
-    { "id": "fish02", "path": "assets/fish/enemies/map2/fish02", "size": 55, "points": 10, "speed": 130, "ai": "wander", "can_eat_player": false },
-    { "id": "fish03", "path": "assets/fish/enemies/map2/fish03", "size": 20, "points": 15, "speed": 140, "ai": "wander", "can_eat_player": false },
-    { "id": "fish04", "path": "assets/fish/enemies/map2/fish04", "size": 100, "points": 20, "speed": 145, "ai": "wander", "can_eat_player": false },
+    { "id": "fish01", "path": "assets/fish/enemies/map2/fish01", "points": 10, "speed": 120, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 90, "weight": 12 },
+    { "id": "fish02", "path": "assets/fish/enemies/map2/fish02", "points": 10, "speed": 130, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 90, "weight": 12 },
+    { "id": "fish03", "path": "assets/fish/enemies/map2/fish03", "points": 15, "speed": 140, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 120, "weight": 10 },
+    { "id": "hippocampus01", "path": "assets/fish/enemies/map2/hippocampus01", "points": 12, "speed": 125, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 140, "weight": 8 },
 
-    { "id": "fish05", "path": "assets/fish/enemies/map2/fish05", "size": 50, "points": 30, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "fish06", "path": "assets/fish/enemies/map2/fish06", "size": 30, "points": 40, "speed": 160, "ai": "predator", "can_eat_player": true },
-    { "id": "fish07", "path": "assets/fish/enemies/map2/fish07", "size": 30, "points": 55, "speed": 165, "ai": "predator", "can_eat_player": true },
-    { "id": "fish08", "path": "assets/fish/enemies/map2/fish08", "size": 34, "points": 70, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "fish09", "path": "assets/fish/enemies/map2/fish09", "size": 38, "points": 85, "speed": 140, "ai": "predator", "can_eat_player": true },
+    { "id": "fish04", "path": "assets/fish/enemies/map2/fish04", "points": 20, "speed": 145, "ai": "dart", "role": "prey", "min_pp": 20, "max_pp": 160, "weight": 10 },
+    { "id": "fish05", "path": "assets/fish/enemies/map2/fish05", "points": 30, "speed": 150, "ai": "shy", "role": "prey", "min_pp": 60, "max_pp": 220, "weight": 7 },
 
-    { "id": "fish10", "path": "assets/fish/enemies/map2/fish10", "size": 42, "points": 110, "speed": 130, "ai": "predator", "can_eat_player": true },
-    { "id": "fish11", "path": "assets/fish/enemies/map2/fish11", "size": 46, "points": 140, "speed": 120, "ai": "predator", "can_eat_player": true },
-    { "id": "fish12", "path": "assets/fish/enemies/map2/fish12", "size": 50, "points": 170, "speed": 110, "ai": "predator", "can_eat_player": true },
+    { "id": "fish06", "path": "assets/fish/enemies/map2/fish06", "points": 40, "speed": 160, "ai": "predator", "role": "predator", "min_pp": 70, "max_pp": 220, "weight": 6 },
+    { "id": "fish07", "path": "assets/fish/enemies/map2/fish07", "points": 55, "speed": 165, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 300, "weight": 5 },
+    { "id": "fish08", "path": "assets/fish/enemies/map2/fish08", "points": 70, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 120, "max_pp": 360, "weight": 4 },
+    { "id": "fish09", "path": "assets/fish/enemies/map2/fish09", "points": 85, "speed": 140, "ai": "predator", "role": "predator", "min_pp": 150, "max_pp": 999, "weight": 3 },
 
-    { "id": "hippocampus01", "path": "assets/fish/enemies/map2/hippocampus01", "size": 18, "points": 12, "speed": 125, "ai": "wander", "can_eat_player": false },
-    { "id": "squid01", "path": "assets/fish/enemies/map2/squid01", "size": 34, "points": 75, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "turtle01", "path": "assets/fish/enemies/map2/turtle01", "size": 600, "points": 160, "speed": 95, "ai": "predator", "can_eat_player": true }
+    { "id": "fish10", "path": "assets/fish/enemies/map2/fish10", "points": 110, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 200, "max_pp": 999, "weight": 2 },
+    { "id": "fish11", "path": "assets/fish/enemies/map2/fish11", "points": 140, "speed": 120, "ai": "predator", "role": "predator", "min_pp": 240, "max_pp": 999, "weight": 2 },
+    { "id": "fish12", "path": "assets/fish/enemies/map2/fish12", "points": 170, "speed": 110, "ai": "predator", "role": "predator", "min_pp": 300, "max_pp": 999, "weight": 1 },
+
+    { "id": "squid01", "path": "assets/fish/enemies/map2/squid01", "points": 75, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 140, "max_pp": 999, "weight": 3 },
+    { "id": "turtle01", "path": "assets/fish/enemies/map2/turtle01", "points": 160, "speed": 95, "ai": "predator", "role": "predator", "min_pp": 280, "max_pp": 999, "weight": 1 }
   ],
 
   "map3": [
-    { "id": "fish01", "path": "assets/fish/enemies/map3/fish01", "size": 16, "points": 12, "speed": 130, "ai": "wander", "can_eat_player": false },
-    { "id": "fish02", "path": "assets/fish/enemies/map3/fish02", "size": 18, "points": 15, "speed": 140, "ai": "wander", "can_eat_player": false },
-    { "id": "fish03", "path": "assets/fish/enemies/map3/fish03", "size": 20, "points": 20, "speed": 150, "ai": "wander", "can_eat_player": false },
+    { "id": "fish01", "path": "assets/fish/enemies/map3/fish01", "points": 12, "speed": 130, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 120, "weight": 10 },
+    { "id": "fish02", "path": "assets/fish/enemies/map3/fish02", "points": 15, "speed": 140, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 140, "weight": 10 },
+    { "id": "fish03", "path": "assets/fish/enemies/map3/fish03", "points": 20, "speed": 150, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 160, "weight": 9 },
+    { "id": "hippocampus01", "path": "assets/fish/enemies/map3/hippocampus01", "points": 15, "speed": 135, "ai": "dart", "role": "prey", "min_pp": 20, "max_pp": 200, "weight": 9 },
 
-    { "id": "fish04", "path": "assets/fish/enemies/map3/fish04", "size": 22, "points": 30, "speed": 155, "ai": "predator", "can_eat_player": true },
-    { "id": "fish05", "path": "assets/fish/enemies/map3/fish05", "size": 26, "points": 45, "speed": 165, "ai": "predator", "can_eat_player": true },
-    { "id": "fish06", "path": "assets/fish/enemies/map3/fish06", "size": 30, "points": 65, "speed": 170, "ai": "predator", "can_eat_player": true },
-    { "id": "fish07", "path": "assets/fish/enemies/map3/fish07", "size": 36, "points": 90, "speed": 160, "ai": "predator", "can_eat_player": true },
-    { "id": "fish08", "path": "assets/fish/enemies/map3/fish08", "size": 42, "points": 120, "speed": 150, "ai": "predator", "can_eat_player": true },
-    { "id": "fish09", "path": "assets/fish/enemies/map3/fish09", "size": 48, "points": 160, "speed": 140, "ai": "predator", "can_eat_player": true },
+    { "id": "fish04", "path": "assets/fish/enemies/map3/fish04", "points": 30, "speed": 155, "ai": "shy", "role": "prey", "min_pp": 60, "max_pp": 240, "weight": 7 },
 
-    { "id": "fish10", "path": "assets/fish/enemies/map3/fish10", "size": 54, "points": 200, "speed": 130, "ai": "predator", "can_eat_player": true },
-    { "id": "fish11", "path": "assets/fish/enemies/map3/fish11", "size": 60, "points": 260, "speed": 120, "ai": "predator", "can_eat_player": true },
-    { "id": "fish12", "path": "assets/fish/enemies/map3/fish12", "size": 66, "points": 320, "speed": 110, "ai": "predator", "can_eat_player": true },
+    { "id": "fish05", "path": "assets/fish/enemies/map3/fish05", "points": 45, "speed": 165, "ai": "predator", "role": "predator", "min_pp": 60, "max_pp": 240, "weight": 7 },
+    { "id": "fish06", "path": "assets/fish/enemies/map3/fish06", "points": 65, "speed": 170, "ai": "predator", "role": "predator", "min_pp": 90, "max_pp": 320, "weight": 6 },
+    { "id": "fish07", "path": "assets/fish/enemies/map3/fish07", "points": 90, "speed": 160, "ai": "predator", "role": "predator", "min_pp": 120, "max_pp": 999, "weight": 5 },
+    { "id": "fish08", "path": "assets/fish/enemies/map3/fish08", "points": 120, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 180, "max_pp": 999, "weight": 4 },
+    { "id": "fish09", "path": "assets/fish/enemies/map3/fish09", "points": 160, "speed": 140, "ai": "predator", "role": "predator", "min_pp": 240, "max_pp": 999, "weight": 3 },
 
-    { "id": "hippocampus01", "path": "assets/fish/enemies/map3/hippocampus01", "size": 20, "points": 15, "speed": 135, "ai": "wander", "can_eat_player": false },
-    { "id": "squid01", "path": "assets/fish/enemies/map3/squid01", "size": 40, "points": 110, "speed": 155, "ai": "predator", "can_eat_player": true },
-    { "id": "turtle01", "path": "assets/fish/enemies/map3/turtle01", "size": 56, "points": 240, "speed": 100, "ai": "predator", "can_eat_player": true }
+    { "id": "fish10", "path": "assets/fish/enemies/map3/fish10", "points": 200, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 300, "max_pp": 999, "weight": 2 },
+    { "id": "fish11", "path": "assets/fish/enemies/map3/fish11", "points": 260, "speed": 120, "ai": "predator", "role": "predator", "min_pp": 360, "max_pp": 999, "weight": 2 },
+    { "id": "fish12", "path": "assets/fish/enemies/map3/fish12", "points": 320, "speed": 110, "ai": "predator", "role": "predator", "min_pp": 420, "max_pp": 999, "weight": 1 },
+
+    { "id": "squid01", "path": "assets/fish/enemies/map3/squid01", "points": 110, "speed": 155, "ai": "predator", "role": "predator", "min_pp": 220, "max_pp": 999, "weight": 3 },
+    { "id": "turtle01", "path": "assets/fish/enemies/map3/turtle01", "points": 240, "speed": 100, "ai": "predator", "role": "predator", "min_pp": 360, "max_pp": 999, "weight": 1 }
   ]
 }

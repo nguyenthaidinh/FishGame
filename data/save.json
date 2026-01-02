@@ -28,6 +28,86 @@
   },
   "history": [
     {
+      "time": "2026-01-03 03:51:48",
+      "mode": 1,
+      "map_id": 1,
+      "points": 134,
+      "time_alive": 37.5159999999993,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 03:19:50",
+      "mode": 1,
+      "map_id": 1,
+      "points": 171,
+      "time_alive": 33.92399999999914,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 02:12:04",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 12.025999999999975,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 01:11:12",
+      "mode": 1,
+      "map_id": 2,
+      "points": 5,
+      "time_alive": 24.10599999999936,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 01:10:43",
+      "mode": 1,
+      "map_id": 1,
+      "points": 501,
+      "time_alive": 59.04000000000025,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-03 01:08:58",
+      "mode": 1,
+      "map_id": 1,
+      "points": 18,
+      "time_alive": 19.90999999999968,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 01:06:31",
+      "mode": 1,
+      "map_id": 2,
+      "points": 5,
+      "time_alive": 8.992000000000022,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 01:06:19",
+      "mode": 1,
+      "map_id": 1,
+      "points": 548,
+      "time_alive": 43.2459999999996,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-03 00:58:27",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 23.871999999999407,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 00:45:23",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 60.70700000000005,
+      "result": "LOSE"
+    },
+    {
       "time": "2026-01-03 00:39:12",
       "mode": 1,
       "map_id": 1,
@@ -277,8 +357,8 @@
     }
   ],
   "settings": {
-    "music": 0.6,
-    "sfx": 0.7,
+    "music": 0.0,
+    "sfx": 0.0,
     "fullscreen": true
   }
 }

@@ -38,23 +38,21 @@ class ImageButton:
         self.image = self._scale(self.image_raw, scale)
         self.image_hover = self._scale(self.image_raw, scale * hover_scale)
 
-        self.alt_image = (
-            self._scale(self.alt_raw, scale) if self.alt_raw else None
-        )
-        self.alt_hover = (
-            self._scale(self.alt_raw, scale * hover_scale)
-            if self.alt_raw else None
-        )
+        self.alt_image = self._scale(self.alt_raw, scale) if self.alt_raw else None
+        self.alt_hover = self._scale(self.alt_raw, scale * hover_scale) if self.alt_raw else None
 
         # =========================
         # STATE
         # =========================
         self.center = center
-        self.rect = self.image.get_rect(center=center)
         self.on_click = on_click
+
         self.hover = False
         self.pressed = False
         self.use_alt = False
+
+        # rect init (theo image thường)
+        self.rect = self.image.get_rect(center=center)
 
     # =========================
     # SCALE
@@ -62,24 +60,34 @@ class ImageButton:
     def _scale(self, img, scale):
         w = int(img.get_width() * scale * self.scale_x)
         h = int(img.get_height() * scale * self.scale_y)
+        w = max(1, w)
+        h = max(1, h)
         return pygame.transform.smoothscale(img, (w, h))
 
     # =========================
-    # PIXEL-PERFECT HOVER
+    # PIXEL-PERFECT
     # =========================
-    def _pixel_hover(self, img, rect, mouse_pos):
+    def _pixel_hit(self, img, rect, mouse_pos):
         if not rect.collidepoint(mouse_pos):
             return False
 
-        # tọa độ chuột tương đối trong ảnh
         x = mouse_pos[0] - rect.left
         y = mouse_pos[1] - rect.top
+        if x < 0 or y < 0 or x >= rect.w or y >= rect.h:
+            return False
 
         try:
-            # kiểm tra alpha (pixel trong suốt hay không)
             return img.get_at((int(x), int(y))).a > 10
-        except IndexError:
+        except Exception:
             return False
+
+    # =========================
+    # CURRENT IMAGE
+    # =========================
+    def _current_img(self):
+        if self.use_alt and self.alt_raw:
+            return self.alt_hover if self.hover else self.alt_image
+        return self.image_hover if self.hover else self.image
 
     # =========================
     # EVENTS
@@ -87,14 +95,11 @@ class ImageButton:
     def handle_event(self, event):
         mouse_pos = pygame.mouse.get_pos()
 
-        # chọn ảnh đang hiển thị để test hover
-        if self.use_alt and self.alt_raw:
-            img = self.alt_hover if self.hover else self.alt_image
-        else:
-            img = self.image_hover if self.hover else self.image
-
         if event.type == pygame.MOUSEMOTION:
-            self.hover = self._pixel_hover(img, self.rect, mouse_pos)
+            # IMPORTANT: update rect theo trạng thái hiện tại trước khi test pixel
+            img_now = self._current_img()
+            self.rect = img_now.get_rect(center=self.center)
+            self.hover = self._pixel_hit(img_now, self.rect, mouse_pos)
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hover:
@@ -104,8 +109,8 @@ class ImageButton:
             if self.pressed and self.hover:
                 if self.click_sound:
                     self.click_sound.play()
-
-                self.on_click()
+                if callable(self.on_click):
+                    self.on_click()
 
                 if self.alt_raw:
                     self.use_alt = not self.use_alt
@@ -116,12 +121,6 @@ class ImageButton:
     # DRAW
     # =========================
     def draw(self, screen):
-        # chọn ảnh theo trạng thái
-        if self.use_alt and self.alt_raw:
-            img = self.alt_hover if self.hover else self.alt_image
-        else:
-            img = self.image_hover if self.hover else self.image
-
-        # ⭐ rect LUÔN KHỚP ẢNH ĐANG VẼ
+        img = self._current_img()
         self.rect = img.get_rect(center=self.center)
         screen.blit(img, self.rect)

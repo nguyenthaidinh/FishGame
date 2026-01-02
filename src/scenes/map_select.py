@@ -1,22 +1,17 @@
 import json
 import pygame
 from src.core.scene import Scene
-from src.ui.button import Button
+from src.ui.image_button import ImageButton
 
-
-# =========================
-# CONSTANT
-# =========================
 FONT_PATH = "assets/fonts/Baloo2-Bold.ttf"
 
 
-# =========================
-# HELPERS
-# =========================
 def draw_cover(screen, image, w, h, alpha=255):
     if image is None:
         return
     iw, ih = image.get_width(), image.get_height()
+    if iw <= 0 or ih <= 0:
+        return
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
     surf = pygame.transform.smoothscale(image, (nw, nh))
@@ -27,13 +22,6 @@ def draw_cover(screen, image, w, h, alpha=255):
     screen.blit(surf, (x, y))
 
 
-def clamp(x, a, b):
-    return a if x < a else b if x > b else x
-
-
-# =========================
-# MAP CARD
-# =========================
 class MapCard:
     def __init__(self, rect, map_data, thumb, unlocked, font_title, font_small):
         self.rect = pygame.Rect(rect)
@@ -54,6 +42,39 @@ class MapCard:
     def hit(self, pos):
         return self.rect.collidepoint(pos)
 
+    def _draw_thumb_rounded_cover(self, screen, thumb, rect, radius=14):
+        # nền
+        pygame.draw.rect(screen, (8, 14, 26), rect, border_radius=radius)
+
+        if thumb is None:
+            pygame.draw.rect(screen, (60, 90, 130), rect, 2, border_radius=radius)
+            return
+
+        tw, th = thumb.get_width(), thumb.get_height()
+        if tw <= 0 or th <= 0:
+            pygame.draw.rect(screen, (60, 90, 130), rect, 2, border_radius=radius)
+            return
+
+        # cover scale
+        scale = max(rect.w / tw, rect.h / th)
+        nw, nh = int(tw * scale), int(th * scale)
+        img = pygame.transform.smoothscale(thumb, (nw, nh)).convert_alpha()
+
+        # surface clip
+        clipped = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA)
+        clipped.blit(img, (rect.w // 2 - nw // 2, rect.h // 2 - nh // 2))
+
+        # mask bo góc
+        mask = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA)
+        mask.fill((0, 0, 0, 0))
+        pygame.draw.rect(mask, (255, 255, 255, 255), mask.get_rect(), border_radius=radius)
+        clipped.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+        screen.blit(clipped, rect.topleft)
+
+        # viền
+        pygame.draw.rect(screen, (60, 90, 130), rect, 2, border_radius=radius)
+
     def draw(self, screen, selected=False):
         r = self.rect.copy()
         r.y -= int(self.lift)
@@ -62,8 +83,10 @@ class MapCard:
         if self.hover > 0.01:
             glow = pygame.Surface((r.w + 20, r.h + 20), pygame.SRCALPHA)
             pygame.draw.rect(
-                glow, (120, 200, 255, int(90 * self.hover)),
-                glow.get_rect(), border_radius=22
+                glow,
+                (120, 200, 255, int(90 * self.hover)),
+                glow.get_rect(),
+                border_radius=22
             )
             screen.blit(glow, (r.x - 10, r.y - 10))
 
@@ -73,40 +96,32 @@ class MapCard:
         pygame.draw.rect(screen, bg_color, r, border_radius=18)
         pygame.draw.rect(screen, border, r, 2, border_radius=18)
 
-        # thumbnail
+        # thumbnail rounded
         thumb_rect = pygame.Rect(r.x + 12, r.y + 12, 140, r.h - 24)
-        pygame.draw.rect(screen, (0, 0, 0), thumb_rect, border_radius=14)
-
-        if self.thumb:
-            tw, th = self.thumb.get_width(), self.thumb.get_height()
-            scale = max(thumb_rect.w / tw, thumb_rect.h / th)
-            nw, nh = int(tw * scale), int(th * scale)
-            img = pygame.transform.smoothscale(self.thumb, (nw, nh))
-            screen.blit(
-                img,
-                (thumb_rect.centerx - nw // 2,
-                 thumb_rect.centery - nh // 2)
-            )
+        self._draw_thumb_rounded_cover(screen, self.thumb, thumb_rect, radius=14)
 
         # text
         name = self.map.get("name", "Map")
         wsize = self.map.get("world_size", [3000, 1800])
 
+        # goal: hỗ trợ cả goal / goal_points
+        goal = self.map.get("goal", self.map.get("goal_points", None))
+
         tx = r.x + 170
         ty = r.y + 22
 
+        screen.blit(self.font_title.render(name, True, (235, 245, 255)), (tx, ty))
         screen.blit(
-            self.font_title.render(name, True, (235, 245, 255)),
-            (tx, ty)
-        )
-        screen.blit(
-            self.font_small.render(
-                f"World: {wsize[0]} x {wsize[1]}",
-                True, (190, 210, 235)
-            ),
+            self.font_small.render(f"World: {wsize[0]} x {wsize[1]}", True, (190, 210, 235)),
             (tx, ty + 32)
         )
+        if goal is not None:
+            screen.blit(
+                self.font_small.render(f"Goal: {goal} pts", True, (190, 210, 235)),
+                (tx, ty + 54)
+            )
 
+        # locked overlay
         if not self.unlocked:
             overlay = pygame.Surface((r.w, r.h), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
@@ -116,36 +131,31 @@ class MapCard:
             screen.blit(lock, lock.get_rect(center=r.center))
 
 
-# =========================
-# MAP SELECT SCENE
-# =========================
 class MapSelectScene(Scene):
     def on_enter(self, **kwargs):
-        # ===== FONT =====
+        # fonts
         self.h1 = self.app.assets.font(FONT_PATH, 46)
         self.font_card = self.app.assets.font(FONT_PATH, 26)
         self.font_small = self.app.assets.font(FONT_PATH, 18)
-        self.btn_font = self.app.assets.font(FONT_PATH, 22)
 
-        # ===== BACKGROUND =====
+        # bg
         self.bg = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
 
-        # ===== LOAD MAP DATA =====
+        # load maps
         self.maps = []
         for i in [1, 2, 3]:
             with open(f"data/maps/map{i}.json", "r", encoding="utf-8") as f:
                 self.maps.append(json.load(f))
 
+        # thumbs
         self.thumbs = {}
         for i in [1, 2, 3]:
             try:
-                self.thumbs[i] = self.app.assets.image(
-                    f"assets/bg/map{i}_bg.jpg"
-                )
+                self.thumbs[i] = self.app.assets.image(f"assets/bg/map{i}_bg.jpg")
             except Exception:
                 self.thumbs[i] = None
 
-        # ===== CREATE CARDS =====
+        # create cards
         cx = self.app.width // 2
         y0 = 240
         self.cards = []
@@ -156,27 +166,35 @@ class MapSelectScene(Scene):
             rect = (cx - 320, y0 + idx * 140, 640, 120)
 
             self.cards.append(
-                MapCard(
-                    rect, m, self.thumbs.get(map_id),
-                    unlocked, self.font_card, self.font_small
-                )
+                MapCard(rect, m, self.thumbs.get(map_id), unlocked, self.font_card, self.font_small)
             )
-
-        # ===== BACK BUTTON =====
-        theme = self.app.theme
-        self.btn_back = Button(
-            (30, 20, 120, 44),
-            "BACK",
-            self.app.back,
-            self.btn_font,
-            theme
-        )
 
         self.selected_index = 0
 
-    # =========================
-    # EVENTS
-    # =========================
+        # BACK BUTTON = IMAGE (dùng đúng ảnh Lio có)
+        # ảnh Lio: assets/ui/button/back.png
+        # đặt "center" để ImageButton hoạt động
+        back_img_path = "assets/ui/button/back.png"
+        back_raw = pygame.image.load(back_img_path).convert_alpha()
+
+        # ===== KÍCH CỠ & VỊ TRÍ GIỐNG Button((30, 20, 120, 44)) =====
+        x, y, w, h = 30, 20, 120, 44
+        center = (x + w // 2, y + h // 2)
+
+        scale_x = w / back_raw.get_width()
+        scale_y = h / back_raw.get_height()
+
+        self.btn_back = ImageButton(
+            image_path=back_img_path,
+            center=center,
+            on_click=self.app.back,
+            scale=2.5,          # giữ 1.0
+            scale_x=scale_x,    # ép đúng width
+            scale_y=scale_y,    # ép đúng height
+            hover_scale=1.08    # hover nhẹ
+        )
+
+
     def handle_event(self, event):
         self.btn_back.handle_event(event)
 
@@ -207,9 +225,6 @@ class MapSelectScene(Scene):
         self.app.runtime["map"] = map_data
         self.app.scenes.set_scene(FishSelectScene(self.app))
 
-    # =========================
-    # DRAW
-    # =========================
     def draw(self, screen):
         draw_cover(screen, self.bg, self.app.width, self.app.height)
 

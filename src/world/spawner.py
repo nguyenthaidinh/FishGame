@@ -1,6 +1,11 @@
 # src/world/spawner.py
-import os, json, random
-from src.entities.prey import PreyFish, ShyPreyFish
+import os
+import json
+import random
+
+from src.entities.prey import PreyFish
+from src.entities.shy_prey_fish import ShyPreyFish
+from src.entities.ai_fish import PredatorFish
 
 
 # =========================
@@ -11,21 +16,27 @@ def _project_root():
 
 
 def _load_fish_enemies():
-    root = _project_root()
-    path = os.path.join(root, "data", "fish_enemies.json")
+    path = os.path.join(_project_root(), "data", "fish_enemies.json")
     if not os.path.exists(path):
         print("⚠ fish_enemies.json not found:", path)
         return {}
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f) or {}
-    except Exception as e:
-        print("⚠ fish_enemies.json read error:", e)
-        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f) or {}
+
+
+def _weighted_choice(items):
+    total = sum(max(0, int(it.get("weight", 1))) for it in items)
+    r = random.uniform(0, total)
+    s = 0
+    for it in items:
+        s += max(0, int(it.get("weight", 1)))
+        if r <= s:
+            return it
+    return items[-1]
 
 
 # =========================
-# Spawner (NEW – CHUẨN)
+# Spawner (MATCH PREY.PY)
 # =========================
 class Spawner:
     def __init__(self, world_w, world_h):
@@ -33,80 +44,99 @@ class Spawner:
         self.world_h = world_h
 
         self.timer = 0.0
-        self.base_interval = 0.45
+        self.base_interval = 0.75
 
-        # load JSON 1 lần
         self.enemies_cfg = _load_fish_enemies()
 
-    # =========================
-    # Spawn position near camera
-    # =========================
     def _spawn_pos_near_camera(self, camera):
         margin = 220
-        left = int(camera.offset.x) - margin
-        right = int(camera.offset.x + camera.sw) + margin
-        top = int(camera.offset.y) - margin
-        bottom = int(camera.offset.y + camera.sh) + margin
-
-        x = random.randint(max(80, left), min(self.world_w - 80, right))
-        y = random.randint(max(80, top), min(self.world_h - 80, bottom))
+        x = random.randint(
+            max(80, int(camera.offset.x) - margin),
+            min(self.world_w - 80, int(camera.offset.x + camera.sw) + margin),
+        )
+        y = random.randint(
+            max(80, int(camera.offset.y) - margin),
+            min(self.world_h - 80, int(camera.offset.y + camera.sh) + margin),
+        )
         return x, y
 
-    # =========================
-    # Shy prey probability
-    # =========================
-    def _should_spawn_shy(self, map_id: int, player_points: int) -> bool:
-        base = 0.10 if map_id == 1 else 0.14 if map_id == 2 else 0.18
-        bonus = min(0.06, player_points / 2000.0)
-        return random.random() < min(0.25, base + bonus)
-
-    # =========================
-    # Update (JSON-DRIVEN)
-    # =========================
-    def update(self, dt, player_points, prey_list, camera, map_id=1):
+    def update(self, dt, player_points, preys, predators, camera, map_id=1):
         self.timer += dt
-        interval = max(0.22, self.base_interval - min(0.18, player_points / 1200.0))
+
+        interval = max(0.55, self.base_interval - min(0.25, player_points / 1800.0))
+        if self.timer < interval:
+            return
+        self.timer = 0.0  # ⭐ mỗi lần spawn 1 con
 
         enemies = self.enemies_cfg.get(f"map{int(map_id)}", [])
         if not enemies:
             return
 
-        while self.timer >= interval:
-            self.timer -= interval
+        pp = int(player_points)
+        small_count = sum(1 for p in preys if p.points <= 5)
 
-            # chọn 1 loại cá từ JSON
-            enemy = random.choice(enemies)
+        # ===== build pool theo điểm =====
+        pool = []
+        for e in enemies:
+            pts = int(e.get("points", 5))
 
-            points = int(enemy.get("points", 5))
-            size = int(enemy.get("size", 16))
-            fish_folder = enemy.get("path")
+            # chặn spam cá 5
+            if pts <= 5 and small_count >= 8:
+                continue
 
-            # radius logic → hitbox + scale
-            radius = int(size * 0.25)
+            if pp < 50 and pts <= 8:
+                pool.append(e)
+            elif pp < 120 and pts <= 30:
+                pool.append(e)
+            elif pp < 220 and pts <= 80:
+                pool.append(e)
+            elif pp >= 220:
+                pool.append(e)
 
-            x, y = self._spawn_pos_near_camera(camera)
+        if not pool:
+            return
 
-            # cá nhút nhát chỉ áp dụng cho cá KHÔNG ăn player
-            if (
-                self._should_spawn_shy(map_id, player_points)
-                and not enemy.get("can_eat_player", False)
-            ):
-                prey_list.append(
-                    ShyPreyFish(
-                        (x, y),
-                        points=points,
-                        radius=radius,
-                        fish_folder=fish_folder,
-                        flee_radius=260.0,
-                        flee_boost=2.2,
-                    )
+        enemy = _weighted_choice(pool)
+
+        x, y = self._spawn_pos_near_camera(camera)
+
+        fish_folder = enemy["path"]
+        points = int(enemy.get("points", 10))
+        speed = float(enemy.get("speed", 120))
+        ai = enemy.get("ai", "wander")
+        role = enemy.get("role", "prey")
+
+        # ===== predator =====
+        if role == "predator" or ai == "predator":
+            if len(predators) >= 6 + pp // 120:
+                return
+
+            predators.append(
+                PredatorFish(
+                    pos=(x, y),
+                    fish_folder=fish_folder,
+                    points=points,
                 )
-            else:
-                prey_list.append(
-                    PreyFish(
-                        (x, y),
-                        points=points,
-                        radius=radius,
-                        fish_folder=fish_folder,
-                    )
+            )
+            return
+
+        # ===== prey =====
+        if ai == "shy":
+            preys.append(
+                ShyPreyFish(
+                    pos=(x, y),
+                    fish_folder=fish_folder,
+                    points=points,
+                    speed=speed,
                 )
+            )
+        else:
+            preys.append(
+                PreyFish(
+                    pos=(x, y),
+                    fish_folder=fish_folder,
+                    points=points,
+                    speed=speed,
+                    ai=ai,
+                )
+            )

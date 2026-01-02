@@ -9,41 +9,53 @@ from src.entities.animated_sprite import AnimatedSprite
 
 class PreyFish(Entity):
     """
-    Cá mồi cơ bản:
-    - Kích thước (scale + hitbox) lấy từ JSON (size)
-    - radius dùng cho va chạm
-    - scale dùng cho hiển thị (tuyến tính theo radius)
+    Cá mồi:
+    - size/scale phụ thuộc points (điểm thấp nhỏ, điểm cao to)
+    - speed lấy từ JSON
+    - ai: wander | dart
     """
 
     def __init__(
         self,
         pos,
-        points: int,
-        radius: int,
         fish_folder: Optional[str] = None,
-        speed_range=(35, 90),
-        fps=8,
+        points: int = 10,
+        speed: float = 120.0,
+        ai: str = "wander",
+        fps: int = 8,
     ):
         super().__init__(pos)
 
-        # ===== DATA FROM JSON =====
         self.points = int(points)
-        self.radius = int(radius)
+        self.ai = (ai or "wander").lower()
 
-        # ===== SCALE TUYẾN TÍNH THEO RADIUS (CHUẨN) =====
-        # Quy ước:
-        # - radius ~ size * 0.35 (Spawner)
-        # - BASE_RADIUS là radius chuẩn của cá nhỏ (map dễ)
-        BASE_RADIUS = 16.0
-        BASE_SCALE = 0.40
+        # ===== SCALE THEO POINTS =====
+        # clamp để không quá to / quá bé
+        p = max(1, min(320, self.points))
+        self.scale = 0.55 + (p / 320.0) * 1.10     # ~0.55 -> ~1.65
+        self.scale = max(0.45, min(self.scale, 1.75))
 
-        self.scale = (self.radius / BASE_RADIUS) * BASE_SCALE
-        self.scale = max(0.25, min(self.scale, 1.25))  # clamp an toàn
+        # ===== HIT RADIUS THEO SCALE =====
+        # base hit radius cho cá nhỏ
+        base_r = 18.0
+        self.hit_radius = base_r * self.scale
 
-        # ===== MOVE RANDOM =====
+        # ===== SPEED (JSON) + TINH CHỈNH NHẸ =====
+        # cá to hơi nhanh hơn chút, nhưng không tăng quá nhiều
+        self.base_speed = float(speed) + (p / 320.0) * 25.0
+
+        # ===== WANDER / DART STATE =====
+        self._turn_t = 0.0
+        self._turn_cd = random.uniform(0.9, 1.6)
+
+        # dart: burst ngắn
+        self._dart_t = 0.0
+        self._dart_cd = random.uniform(1.2, 2.4)
+        self._dart_time = 0.0
+
+        # ===== INIT VELOCITY =====
         ang = random.random() * 6.283
-        spd = random.randint(int(speed_range[0]), int(speed_range[1]))
-        self.vel = pygame.Vector2(spd, 0).rotate_rad(ang)
+        self.vel = pygame.Vector2(1, 0).rotate_rad(ang) * self.base_speed
 
         # ===== SPRITE =====
         self.sprite: Optional[AnimatedSprite] = None
@@ -51,10 +63,7 @@ class PreyFish(Entity):
 
         if fish_folder:
             self.sprite = AnimatedSprite(
-                [
-                    f"{fish_folder}/swim_01.png",
-                    f"{fish_folder}/swim_02.png",
-                ],
+                [f"{fish_folder}/swim_01.png", f"{fish_folder}/swim_02.png"],
                 fps=fps,
             )
 
@@ -67,7 +76,7 @@ class PreyFish(Entity):
     # HITBOX
     # =========================
     def rect(self) -> pygame.Rect:
-        r = self.radius
+        r = self.hit_radius
         return pygame.Rect(
             int(self.pos.x - r),
             int(self.pos.y - r),
@@ -76,24 +85,85 @@ class PreyFish(Entity):
         )
 
     # =========================
-    # MOVEMENT
+    # HELPERS
     # =========================
+    def _rand_dir(self) -> pygame.Vector2:
+        v = pygame.Vector2(random.uniform(-1, 1), random.uniform(-1, 1))
+        if v.length_squared() > 0.001:
+            v = v.normalize()
+        else:
+            v = pygame.Vector2(1, 0)
+        return v
+
     def _bounce_bounds(self, world_w, world_h):
-        if self.pos.x < 20:
-            self.pos.x = 20
+        pad = 40
+        if self.pos.x < pad:
+            self.pos.x = pad
             self.vel.x *= -1
-        elif self.pos.x > world_w - 20:
-            self.pos.x = world_w - 20
+        elif self.pos.x > world_w - pad:
+            self.pos.x = world_w - pad
             self.vel.x *= -1
 
-        if self.pos.y < 20:
-            self.pos.y = 20
+        if self.pos.y < pad:
+            self.pos.y = pad
             self.vel.y *= -1
-        elif self.pos.y > world_h - 20:
-            self.pos.y = world_h - 20
+        elif self.pos.y > world_h - pad:
+            self.pos.y = world_h - pad
             self.vel.y *= -1
 
+    # =========================
+    # AI MOVE
+    # =========================
+    def _update_wander(self, dt):
+        self._turn_t += dt
+        if self._turn_t >= self._turn_cd:
+            self._turn_t = 0.0
+            self._turn_cd = random.uniform(0.9, 1.6)
+
+            # đổi hướng nhẹ
+            dirv = self._rand_dir()
+            target = dirv * self.base_speed
+            self.vel += (target - self.vel) * 0.35
+
+        # giữ speed ổn định
+        if self.vel.length_squared() > 1:
+            self.vel = self.vel.normalize() * self.base_speed
+
+    def _update_dart(self, dt):
+        # nền: vẫn wander nhưng turn nhanh hơn
+        self._turn_t += dt
+        if self._turn_t >= 0.55:
+            self._turn_t = 0.0
+            dirv = self._rand_dir()
+            target = dirv * self.base_speed
+            self.vel += (target - self.vel) * 0.55
+
+        # burst ngắn
+        self._dart_t += dt
+        if self._dart_time > 0.0:
+            self._dart_time -= dt
+        else:
+            if self._dart_t >= self._dart_cd:
+                self._dart_t = 0.0
+                self._dart_cd = random.uniform(1.2, 2.4)
+                self._dart_time = random.uniform(0.18, 0.32)
+
+        boost = 1.0
+        if self._dart_time > 0.0:
+            boost = 1.65  # dart mạnh
+
+        if self.vel.length_squared() > 1:
+            self.vel = self.vel.normalize() * (self.base_speed * boost)
+
+    # =========================
+    # UPDATE
+    # =========================
     def update(self, dt, world_w, world_h, **kwargs):
+        if self.ai == "dart":
+            self._update_dart(dt)
+        else:
+            self._update_wander(dt)
+
         self.pos += self.vel * dt
         self._bounce_bounds(world_w, world_h)
 
@@ -112,7 +182,6 @@ class PreyFish(Entity):
     def _ensure_label(self, font):
         if self._label_value == self.points and self._label_surf is not None:
             return
-
         self._label_value = self.points
         s = str(self.points)
         self._label_surf = font.render(s, True, (245, 250, 255))
@@ -130,98 +199,15 @@ class PreyFish(Entity):
             screen.blit(img, rect)
             r_for_label = rect.height // 2
         else:
-            pygame.draw.circle(
-                screen,
-                (255, 170, 90),
-                (int(p.x), int(p.y)),
-                self.radius,
-            )
-            pygame.draw.circle(
-                screen,
-                (0, 0, 0),
-                (int(p.x), int(p.y)),
-                self.radius,
-                2,
-            )
-            r_for_label = self.radius
+            # fallback
+            pygame.draw.circle(screen, (255, 170, 90), (int(p.x), int(p.y)), int(self.hit_radius))
+            pygame.draw.circle(screen, (0, 0, 0), (int(p.x), int(p.y)), int(self.hit_radius), 2)
+            r_for_label = int(self.hit_radius)
 
         if font:
             self._ensure_label(font)
             tx = int(p.x)
             ty = int(p.y - r_for_label - 12)
 
-            screen.blit(
-                self._label_outline,
-                self._label_outline.get_rect(center=(tx + 1, ty + 1)),
-            )
-            screen.blit(
-                self._label_surf,
-                self._label_surf.get_rect(center=(tx, ty)),
-            )
-
-
-# =========================
-# SHY PREY
-# =========================
-class ShyPreyFish(PreyFish):
-    """
-    Cá mồi nhút nhát:
-    - Player tới gần thì chạy trốn
-    """
-
-    def __init__(
-        self,
-        pos,
-        points: int,
-        radius: int,
-        fish_folder: Optional[str] = None,
-        flee_radius: float = 260.0,
-        flee_boost: float = 2.2,
-        calm_turn_rate: float = 0.10,
-        speed_range=(35, 90),
-        fps=8,
-    ):
-        super().__init__(
-            pos=pos,
-            points=points,
-            radius=radius,
-            fish_folder=fish_folder,
-            speed_range=speed_range,
-            fps=fps,
-        )
-
-        self.flee_radius = float(flee_radius)
-        self.flee_boost = float(flee_boost)
-        self.calm_turn_rate = float(calm_turn_rate)
-
-        self.base_speed = max(35.0, self.vel.length())
-        self.wander_t = random.random() * 10.0
-
-    def update(self, dt, world_w, world_h, players=None, **kwargs):
-        flee_dir = None
-
-        if players:
-            nearest = min(
-                players,
-                key=lambda p: (p.pos - self.pos).length_squared(),
-            )
-            d2 = (nearest.pos - self.pos).length_squared()
-
-            if d2 <= self.flee_radius ** 2:
-                v = self.pos - nearest.pos
-                if v.length_squared() > 1:
-                    flee_dir = v.normalize()
-
-        if flee_dir is not None:
-            target_vel = flee_dir * (self.base_speed * self.flee_boost)
-            self.vel += (target_vel - self.vel) * min(1.0, dt * 6.0)
-        else:
-            self.wander_t += dt
-            if self.wander_t > 1.2:
-                self.wander_t = 0.0
-                self.vel = self.vel.rotate_rad(random.uniform(-0.7, 0.7))
-
-            if self.vel.length_squared() > 1:
-                self.vel = self.vel.normalize() * self.base_speed
-
-        super().update(dt, world_w, world_h)
+            screen.blit(self._label_outline, self._label_outline.get_rect(center=(tx + 1, ty + 1)))
+            screen.blit(self._label_surf, self._label_surf.get_rect(center=(tx, ty)))

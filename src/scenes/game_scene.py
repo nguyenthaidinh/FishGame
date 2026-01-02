@@ -31,13 +31,16 @@ class GameScene(Scene):
         self.TARGET_POINTS = self.MAP_TARGETS.get(self.map_id, 300)
 
         # ===== mode: 1P/2P =====
-        # Lấy từ runtime nếu có (ModeSelectScene set), không có thì mặc định 1
         self.mode = int(self.app.runtime.get("mode", 1))
         self.mode = 2 if self.mode == 2 else 1
 
-        # ===== Background =====
+        # ===== Background (cache scaled 1 lần) =====
         self.bg = self.app.assets.image(self.map["bg"]) if self.map.get("bg") else None
-        self.bg_world = pygame.transform.smoothscale(self.bg, (self.world_w, self.world_h)) if self.bg else None
+        self.bg_world = (
+            pygame.transform.smoothscale(self.bg, (self.world_w, self.world_h))
+            if self.bg
+            else None
+        )
 
         # ===== Camera =====
         self.camera = Camera(self.app.width, self.app.height, self.world_w, self.world_h)
@@ -52,6 +55,7 @@ class GameScene(Scene):
 
         # ===== Enemies / Drops =====
         self.preys = []
+        self.predators = []  # ✅ NEW
         self.spawner = Spawner(self.world_w, self.world_h)
 
         self.drops = []
@@ -65,6 +69,9 @@ class GameScene(Scene):
         cur_area = self.world_w * self.world_h
         self.max_preys = int(90 * (cur_area / base_area))
         self.max_preys = max(45, min(120, self.max_preys))
+
+        # predator cap (ít hơn prey)
+        self.max_predators = max(6, min(18, int(self.max_preys * 0.18)))
 
         # ===== Camera init =====
         self._camera_follow_players()
@@ -92,7 +99,6 @@ class GameScene(Scene):
     # Create/ensure players
     # =========================
     def _ensure_players(self):
-        # luôn build lại theo mode để đúng phím theo yêu cầu
         p1_fish = self.app.save.data.get("selected_fish_p1", "fish01")
         p2_fish = self.app.save.data.get("selected_fish_p2", "fish02")
 
@@ -104,7 +110,7 @@ class GameScene(Scene):
             "right": pygame.K_RIGHT,
         }
 
-        # ✅ 2P: người chơi 2 dùng WASD
+        # ✅ 2P: WASD
         p2_controls = {
             "up": pygame.K_w,
             "down": pygame.K_s,
@@ -116,6 +122,7 @@ class GameScene(Scene):
             pos=(self.world_w / 2 - 80, self.world_h / 2),
             controls=p1_controls,
             fish_folder=f"assets/fish/player/{p1_fish}",
+            player_id=1,
         )
         p1.points = 5
 
@@ -126,6 +133,7 @@ class GameScene(Scene):
                 pos=(self.world_w / 2 + 80, self.world_h / 2),
                 controls=p2_controls,
                 fish_folder=f"assets/fish/player/{p2_fish}",
+                player_id=2,
             )
             p2.points = 5
             players.append(p2)
@@ -137,7 +145,7 @@ class GameScene(Scene):
     # Helpers
     # =========================
     def _player_radius(self, p: PlayerFish) -> float:
-        img = p.sprite.get_image(scale=p.scale / p.render_div)
+        img = p.sprite.get_image(scale=(p.scale / p.render_div))
         return max(img.get_width(), img.get_height()) * 0.35
 
     def _player_rect(self, p: PlayerFish) -> pygame.Rect:
@@ -187,7 +195,6 @@ class GameScene(Scene):
             if p.lives > 0:
                 p.update(dt)
 
-            # clamp theo radius
             r = self._player_radius(p)
             p.pos.x = max(r, min(self.world_w - r, p.pos.x))
             p.pos.y = max(r, min(self.world_h - r, p.pos.y))
@@ -196,22 +203,40 @@ class GameScene(Scene):
         self._camera_follow_players()
         self.camera.update(dt)
 
-        # spawn difficulty lấy theo P1 points (giữ logic cũ), hoặc dùng avg
+        # difficulty points (giữ logic cũ: dựa P1)
         avg_pts = int(self.players[0].points)
 
+        # update prey
         for prey in self.preys:
             prey.update(dt, self.world_w, self.world_h, players=self.players)
 
-        if len(self.preys) < self.max_preys:
-            self.spawner.update(dt, avg_pts, self.preys, self.camera, map_id=self.map_id)
+        # update predator
+        for pr in self.predators:
+            pr.update(dt, self.world_w, self.world_h, players=self.players)
 
+        # spawn
+        if len(self.preys) < self.max_preys or len(self.predators) < self.max_predators:
+            # ✅ signature mới
+            self.spawner.update(
+                dt,
+                player_points=avg_pts,
+                preys=self.preys,
+                predators=self.predators,
+                camera=self.camera,
+                map_id=self.map_id
+            )
+
+        # drops
         self.drop_spawner.update(dt, self.drops, self.map_id, avg_pts)
         for d in self.drops:
             d.update(dt, self.world_w, self.world_h)
 
+        # collision
         self._handle_collisions()
 
-        self.preys = [p for p in self.preys if p.alive]
+        # cleanup
+        self.preys = [e for e in self.preys if getattr(e, "alive", True)]
+        self.predators = [e for e in self.predators if getattr(e, "alive", True)]
         self.drops = [d for d in self.drops if d.alive]
         self.floating = [ft for ft in self.floating if ft.update(dt)]
 
@@ -227,8 +252,9 @@ class GameScene(Scene):
 
             p_rect = self._player_rect(p)
 
+            # ===== prey collisions =====
             for prey in self.preys:
-                if prey.alive and p_rect.colliderect(prey.rect()):
+                if getattr(prey, "alive", True) and p_rect.colliderect(prey.rect()):
                     if prey.points <= int(p.points * 1.02):
                         prey.alive = False
                         gained = p.add_points(prey.points)
@@ -237,6 +263,14 @@ class GameScene(Scene):
                         p.hit()
                         self.camera.shake(6, 0.15)
 
+            # ===== predator collisions (NEW) =====
+            for pr in self.predators:
+                if getattr(pr, "alive", True) and p_rect.colliderect(pr.rect()):
+                    # predator luôn gây damage (player không “ăn” predator ở bản này)
+                    p.hit()
+                    self.camera.shake(10, 0.22)
+
+            # ===== drops collisions =====
             for d in self.drops:
                 if d.alive and p_rect.colliderect(d.rect()):
                     d.alive = False
@@ -250,7 +284,6 @@ class GameScene(Scene):
     # End game
     # =========================
     def _check_end_conditions(self):
-        # ✅ WIN: team points đạt target
         if self._team_points() >= self.TARGET_POINTS:
             try:
                 pygame.mixer.music.fadeout(800)
@@ -265,9 +298,6 @@ class GameScene(Scene):
             )
             return
 
-        # ✅ LOSE:
-        # - 1P: p1 chết là thua
-        # - 2P: cả 2 chết mới thua
         if self.mode == 1:
             if self.players[0].lives <= 0:
                 try:
@@ -307,8 +337,13 @@ class GameScene(Scene):
         for d in self.drops:
             d.draw(screen, self.camera, self.app.assets)
 
+        # draw prey
         for prey in self.preys:
             prey.draw(screen, self.camera, self.app.assets, self.font_small)
+
+        # draw predator (NEW)
+        for pr in self.predators:
+            pr.draw(screen, self.camera, self.font_small)
 
         for p in self.players:
             if p.lives > 0:
@@ -317,13 +352,11 @@ class GameScene(Scene):
         for ft in self.floating:
             ft.draw(screen, self.camera, self.font_small)
 
-        # HUD (giữ HUD cũ theo player[0] để không vỡ layout)
-        # Nếu muốn HUD hiển thị cả P2 mình sẽ nâng cấp HUD sau.
         self.hud.draw(
             screen,
             assets=self.app.assets,
             lives=self.players[0].lives,
-            points=self._team_points(),     # ✅ hiển thị điểm đội cho dễ
+            points=self._team_points(),
             elapsed=self.elapsed,
             target=self.TARGET_POINTS,
             player=self.players[0],
