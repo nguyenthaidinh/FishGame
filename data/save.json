@@ -19,14 +19,39 @@
     "fish11",
     "fish12"
   ],
-  "selected_fish_p1": "fish11",
-  "selected_fish_p2": "fish11",
+  "selected_fish_p1": "fish01",
+  "selected_fish_p2": "fish10",
   "highscores": {
-    "1": 568,
-    "2": 3070,
+    "1": 3983,
+    "2": 3138,
     "3": 5025
   },
-  "history": [],
+  "history": [
+    {
+      "time": "2026-01-02 19:50:08",
+      "mode": 1,
+      "map_id": 1,
+      "points": 3983,
+      "time_alive": 0.575,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 19:49:36",
+      "mode": 1,
+      "map_id": 2,
+      "points": 3138,
+      "time_alive": 48.194999999999794,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 19:48:44",
+      "mode": 1,
+      "map_id": 1,
+      "points": 586,
+      "time_alive": 116.1130000000017,
+      "result": "WIN"
+    }
+  ],
   "settings": {
     "music": 0.6,
     "sfx": 0.7,
