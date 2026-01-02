@@ -68,7 +68,7 @@ class MenuScene(Scene):
                 (cx, y0),
                 self._go_mode,
                 scale=0.2,
-                scale_x=2.0,          # kéo dài ngang
+                scale_x=1.5,          # kéo dài ngang
                 hover_scale=1.2,
                 click_sound=self.click_sound
             ),
@@ -77,7 +77,7 @@ class MenuScene(Scene):
                 (cx, y0 + gap),
                 self._go_leaderboard,
                 scale=0.2,
-                scale_x=2.0,
+                scale_x=1.5,
                 hover_scale=1.2,
                 click_sound=self.click_sound
             ),
@@ -86,7 +86,7 @@ class MenuScene(Scene):
                 (cx, y0 + gap * 2.5),
                 self._go_history,
                 scale=0.2,
-                scale_x=2.0,
+                scale_x=1.5,
                 hover_scale=1.2,
                 click_sound=self.click_sound
             ),
@@ -95,7 +95,7 @@ class MenuScene(Scene):
                 (cx, y0 + gap * 3.5),
                 self.app.quit,
                 scale=0.2,
-                scale_x=2.0,
+                scale_x=1.5,
                 hover_scale=1.2,
                 click_sound=self.click_sound
             ),

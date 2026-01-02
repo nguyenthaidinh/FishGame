@@ -11,8 +11,7 @@ class HomeScene(Scene):
         self.sub_font = self.app.assets.font(None, 22)
         self.btn_font = self.app.assets.font(None, 28)
 
-        cx = self.app.width
- // 2
+        cx = self.app.width // 2
         y = 300
         gap = 72
         theme = getattr(self.app, "theme", {"text": (240,245,255), "muted": (200,215,235)})
@@ -36,10 +35,8 @@ class HomeScene(Scene):
 
         title = self.title_font.render("BIG FISH", True, self.app.theme["text"])
         sub = self.sub_font.render("Eat, grow, survive. Unlock maps & fish.", True, self.app.theme["muted"])
-        screen.blit(title, title.get_rect(center=(self.app.width
-//2, 190)))
-        screen.blit(sub, sub.get_rect(center=(self.app.width
-//2, 240)))
+        screen.blit(title, title.get_rect(center=(self.app.width //2, 190)))
+        screen.blit(sub, sub.get_rect(center=(self.app.width //2, 240)))
 
         for b in self.buttons:
             b.draw(screen)

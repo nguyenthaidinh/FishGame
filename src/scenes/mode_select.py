@@ -8,11 +8,6 @@ from src.scenes.map_select import MapSelectScene
 # Helpers
 # =========================
 def scale_cover(image, w, h):
-    """
-    Scale ảnh nền kiểu cover:
-    - Phủ kín toàn bộ màn hình
-    - Giữ đúng tỉ lệ ảnh
-    """
     iw, ih = image.get_width(), image.get_height()
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
@@ -25,11 +20,10 @@ def scale_cover(image, w, h):
 class ModeSelectScene(Scene):
     def on_enter(self, **kwargs):
         # ===== BACKGROUND =====
-        # (có thể dùng chung ảnh với menu chính)
         bg_raw = self.app.assets.image("assets/bg/mode_bg.png")
         self.bg = scale_cover(bg_raw, self.app.width, self.app.height)
 
-        # ===== FONT (TITLE) =====
+        # ===== FONT =====
         self.h1 = self.app.assets.font(
             "assets/fonts/Fredoka-Bold.ttf", 46
         )
@@ -39,6 +33,9 @@ class ModeSelectScene(Scene):
             "assets/sound/click.wav"
         )
 
+        # ===== BACKGROUND MUSIC =====
+        self._play_bgm()
+
         # ===== LAYOUT =====
         cx = self.app.width // 2
         y0 = int(self.app.height * 0.40)
@@ -46,7 +43,6 @@ class ModeSelectScene(Scene):
 
         # ===== IMAGE BUTTONS =====
         self.buttons = [
-            # ===== 1 PLAYER =====
             ImageButton(
                 "assets/ui/button/1_player.png",
                 (cx, y0),
@@ -57,8 +53,6 @@ class ModeSelectScene(Scene):
                 hover_scale=1.15,
                 click_sound=self.click_sound
             ),
-
-            # ===== 2 PLAYERS =====
             ImageButton(
                 "assets/ui/button/2_player.png",
                 (cx, y0 + gap * 1.5),
@@ -69,8 +63,6 @@ class ModeSelectScene(Scene):
                 hover_scale=1.15,
                 click_sound=self.click_sound
             ),
-
-            # ===== BACK =====
             ImageButton(
                 "assets/ui/button/back.png",
                 (cx, y0 + gap * 3.0),
@@ -82,6 +74,21 @@ class ModeSelectScene(Scene):
                 click_sound=self.click_sound
             ),
         ]
+
+    # =========================
+    # MUSIC
+    # =========================
+    def _play_bgm(self):
+        try:
+            pygame.mixer.music.load("assets/sound/mode_bgm.mp3")
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.play(-1)  # loop vô hạn
+        except Exception as e:
+            print("[WARN] Cannot play mode bgm:", e)
+
+    def on_exit(self):
+        # dừng nhạc khi rời scene (rất quan trọng)
+        pygame.mixer.music.stop()
 
     # =========================
     # LOGIC
@@ -104,7 +111,6 @@ class ModeSelectScene(Scene):
     # DRAW
     # =========================
     def draw(self, screen):
-        # ===== BACKGROUND =====
         screen.blit(
             self.bg,
             self.bg.get_rect(
@@ -112,14 +118,12 @@ class ModeSelectScene(Scene):
             )
         )
 
-        # ===== OVERLAY NHẸ (CHO NÚT NỔI) =====
         overlay = pygame.Surface(
             (self.app.width, self.app.height), pygame.SRCALPHA
         )
-        overlay.fill((0, 30, 60, 70))  # xanh đậm mờ
+        overlay.fill((0, 30, 60, 70))
         screen.blit(overlay, (0, 0))
 
-        # ===== TITLE =====
         title = self.h1.render(
             "Select Mode",
             True,
@@ -130,6 +134,5 @@ class ModeSelectScene(Scene):
             title.get_rect(center=(self.app.width // 2, 220))
         )
 
-        # ===== BUTTONS =====
         for b in self.buttons:
             b.draw(screen)
