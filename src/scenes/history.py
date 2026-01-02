@@ -10,6 +10,8 @@ def draw_cover(screen, image, w, h, alpha=255):
     if image is None:
         return
     iw, ih = image.get_width(), image.get_height()
+    if iw <= 0 or ih <= 0:
+        return
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
     surf = pygame.transform.smoothscale(image, (nw, nh))
@@ -33,15 +35,9 @@ class HistoryScene(Scene):
         self.bg = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
 
         # ===== FONTS =====
-        self.h1 = self.app.assets.font(
-            "assets/fonts/Baloo2-Bold.ttf", 56
-        )
-        self.font = self.app.assets.font(
-            "assets/fonts/Baloo2-Bold.ttf", 24
-        )
-        self.small = self.app.assets.font(
-            "assets/fonts/Baloo2-Bold.ttf", 18
-        )
+        self.h1 = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 56)
+        self.font = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 24)
+        self.small = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 18)
 
         # ===== BACK BUTTON (IMAGE) =====
         self.btn_back = ImageButton(
@@ -53,8 +49,8 @@ class HistoryScene(Scene):
         )
 
         # ===== HISTORY DATA =====
+        # ✅ SaveManager thường insert(0) => mới nhất đã ở đầu list
         self.history = self.app.save.data.get("history", [])
-        self.history = list(reversed(self.history))  # mới nhất lên trên
 
         # ===== PANEL =====
         self.panel = pygame.Rect(
@@ -107,25 +103,17 @@ class HistoryScene(Scene):
         draw_cover(screen, self.bg, self.app.width, self.app.height)
 
         # overlay
-        overlay = pygame.Surface(
-            (self.app.width, self.app.height), pygame.SRCALPHA
-        )
+        overlay = pygame.Surface((self.app.width, self.app.height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 110))
         screen.blit(overlay, (0, 0))
 
         # ===== TITLE =====
-        title = self.h1.render(
-            "History", True, self.app.theme["text"]
-        )
+        title = self.h1.render("History", True, self.app.theme["text"])
         screen.blit(title, (140, 60))
 
         # ===== PANEL =====
-        pygame.draw.rect(
-            screen, (10, 20, 35), self.panel, border_radius=20
-        )
-        pygame.draw.rect(
-            screen, (120, 200, 255), self.panel, 2, border_radius=20
-        )
+        pygame.draw.rect(screen, (10, 20, 35), self.panel, border_radius=20)
+        pygame.draw.rect(screen, (120, 200, 255), self.panel, 2, border_radius=20)
 
         # ===== HEADER =====
         headers = [
@@ -139,10 +127,7 @@ class HistoryScene(Scene):
 
         for text, key in headers:
             t = self.small.render(text, True, (190, 210, 235))
-            screen.blit(
-                t,
-                (self.panel.x + self.col_x[key], self.panel.y + 12)
-            )
+            screen.blit(t, (self.panel.x + self.col_x[key], self.panel.y + 12))
 
         pygame.draw.line(
             screen,
@@ -151,6 +136,21 @@ class HistoryScene(Scene):
             (self.panel.right - 10, self.panel.y + self.header_h),
             1
         )
+
+        # ===== EMPTY STATE =====
+        if not self.history:
+            msg = self.font.render("No history yet.", True, (235, 245, 255))
+            screen.blit(msg, msg.get_rect(center=self.panel.center))
+
+            hint = self.small.render(
+                "Play a match to create history",
+                True,
+                self.app.theme["muted"]
+            )
+            screen.blit(hint, (70, 660))
+
+            self.btn_back.draw(screen)
+            return
 
         # ===== CLIP SCROLL =====
         clip_rect = pygame.Rect(
@@ -187,10 +187,7 @@ class HistoryScene(Scene):
                         color = (235, 245, 255)
 
                     txt = self.font.render(value, True, color)
-                    screen.blit(
-                        txt,
-                        (self.panel.x + self.col_x[key], y)
-                    )
+                    screen.blit(txt, (self.panel.x + self.col_x[key], y))
 
             y += self.row_h
 

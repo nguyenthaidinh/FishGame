@@ -32,10 +32,9 @@ class HUD:
     """
     HUD ingame:
     - Points: current / target
-    - Progress bar
-    - Hearts
+    - Hearts: 3 mạng (heart_full / heart_empty)
     - Time, Map
-    - Buff icons
+    - Buff icons (x2, shield)
     """
 
     def __init__(self, font_big, font_small):
@@ -51,13 +50,6 @@ class HUD:
         self.ico_sh1 = None
         self.ico_sh2 = None
         self.ico_sh3 = None
-
-        # ===== PROGRESS BAR CONFIG =====
-        self.bar_w = 200
-        self.bar_h = 10
-        self.bar_bg = (55, 70, 95)
-        self.bar_fg = (190, 80, 220)
-        self.bar_border = (140, 160, 190)
 
     def _ensure_icons(self, assets):
         if self._loaded:
@@ -77,40 +69,6 @@ class HUD:
         self.ico_sh3 = assets.image("assets/items/thuong3.png")
 
     # =========================
-    # Draw progress bar
-    # =========================
-    def _draw_progress(
-        self, screen, x, y, points, target
-    ):
-        # nền
-        pygame.draw.rect(
-            screen,
-            self.bar_bg,
-            (x, y, self.bar_w, self.bar_h),
-            border_radius=6,
-        )
-
-        # viền
-        pygame.draw.rect(
-            screen,
-            self.bar_border,
-            (x, y, self.bar_w, self.bar_h),
-            1,
-            border_radius=6,
-        )
-
-        # tiến trình
-        ratio = points / max(1, target)
-        fill_w = int(self.bar_w * max(0.0, min(ratio, 1.0)))
-        if fill_w > 0:
-            pygame.draw.rect(
-                screen,
-                self.bar_fg,
-                (x, y, fill_w, self.bar_h),
-                border_radius=6,
-            )
-
-    # =========================
     # Draw
     # =========================
     def draw(
@@ -126,7 +84,7 @@ class HUD:
     ):
         self._ensure_icons(assets)
 
-        # ===== HUD PANEL =====
+        # ===== HUD PANEL (tạm vẽ rect – có thể thay bằng ảnh sau) =====
         panel = pygame.Rect(12, 10, 460, 82)
         pygame.draw.rect(screen, (10, 20, 35), panel, border_radius=18)
         pygame.draw.rect(screen, (110, 190, 255), panel, 2, border_radius=18)
@@ -149,22 +107,13 @@ class HUD:
                     screen, self.ico_heart_empty, cx, base_y, size
                 )
 
-        # ===== POINTS TEXT =====
+        # ===== POINTS =====
         t_points = self.font_big.render(
             f"{points} / {target}",
             True,
             (240, 245, 255),
         )
-        screen.blit(t_points, (130, 16))
-
-        # ===== PROGRESS BAR (ĐÂY LÀ PHẦN BẠN CẦN) =====
-        self._draw_progress(
-            screen,
-            x=130,
-            y=42,
-            points=points,
-            target=target,
-        )
+        screen.blit(t_points, (130, 18))
 
         # ===== TIME + MAP =====
         mm = int(elapsed) // 60
@@ -176,7 +125,7 @@ class HUD:
         t_time = self.font_small.render(
             line, True, (200, 215, 235)
         )
-        screen.blit(t_time, (130, 56))
+        screen.blit(t_time, (130, 52))
 
         # ===== BUFF ICONS (RIGHT SIDE) =====
         bx = panel.right - 26

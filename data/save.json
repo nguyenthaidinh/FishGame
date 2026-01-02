@@ -20,7 +20,7 @@
     "fish12"
   ],
   "selected_fish_p1": "fish02",
-  "selected_fish_p2": "fish10",
+  "selected_fish_p2": "fish06",
   "highscores": {
     "1": 3983,
     "2": 3138,
@@ -28,11 +28,59 @@
   },
   "history": [
     {
-      "time": "2026-01-02 23:08:45",
+      "time": "2026-01-03 00:39:12",
+      "mode": 1,
+      "map_id": 1,
+      "points": 20,
+      "time_alive": 19.830999999999705,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-03 00:30:47",
+      "mode": 1,
+      "map_id": 1,
+      "points": 25,
+      "time_alive": 13.937999999999946,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 23:41:37",
+      "mode": 1,
+      "map_id": 2,
+      "points": 813,
+      "time_alive": 9.727000000000007,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 23:41:24",
+      "mode": 1,
+      "map_id": 1,
+      "points": 533,
+      "time_alive": 71.68200000000084,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-02 23:33:02",
       "mode": 1,
       "map_id": 1,
       "points": 5,
-      "time_alive": 20.17100000000003,
+      "time_alive": 51.30199999999924,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 23:15:23",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 19.52399999999968,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-02 22:37:45",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 31.866999999998995,
       "result": "LOSE"
     },
     {
@@ -229,8 +277,8 @@
     }
   ],
   "settings": {
-    "music": 0.0,
-    "sfx": 0.0,
+    "music": 0.6,
+    "sfx": 0.7,
     "fullscreen": true
   }
 }

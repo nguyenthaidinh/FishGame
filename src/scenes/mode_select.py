@@ -9,6 +9,8 @@ from src.scenes.map_select import MapSelectScene
 # =========================
 def scale_cover(image, w, h):
     iw, ih = image.get_width(), image.get_height()
+    if iw <= 0 or ih <= 0:
+        return None
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
     return pygame.transform.smoothscale(image, (nw, nh))
@@ -49,7 +51,6 @@ class ModeSelectScene(Scene):
                 lambda: self._pick(1),
                 scale=0.22,
                 scale_x=1.5,
-                scale_y=1.0,
                 hover_scale=1.15,
                 click_sound=self.click_sound
             ),
@@ -59,17 +60,15 @@ class ModeSelectScene(Scene):
                 lambda: self._pick(2),
                 scale=0.22,
                 scale_x=1.5,
-                scale_y=1.0,
                 hover_scale=1.15,
                 click_sound=self.click_sound
             ),
             ImageButton(
                 "assets/ui/button/back.png",
                 (cx, y0 + gap * 3.0),
-                self.app.back,
+                self._go_menu,     # ✅ FIX: không dùng app.back
                 scale=0.18,
                 scale_x=1.4,
-                scale_y=1.0,
                 hover_scale=1.12,
                 click_sound=self.click_sound
             ),
@@ -82,20 +81,28 @@ class ModeSelectScene(Scene):
         try:
             pygame.mixer.music.load("assets/sound/mode_bgm.mp3")
             pygame.mixer.music.set_volume(0.5)
-            pygame.mixer.music.play(-1)  # loop vô hạn
+            pygame.mixer.music.play(-1)
         except Exception as e:
             print("[WARN] Cannot play mode bgm:", e)
 
     def on_exit(self):
-        # dừng nhạc khi rời scene (rất quan trọng)
         pygame.mixer.music.stop()
 
     # =========================
     # LOGIC
     # =========================
     def _pick(self, mode: int):
+        # ✅ set mode cho GameScene
         self.app.runtime["mode"] = mode
+
+        # ✅ clear players cũ để tránh sót 2P/1P
+        self.app.runtime.pop("players", None)
+
         self.app.scenes.set_scene(MapSelectScene(self.app))
+
+    def _go_menu(self):
+        from src.scenes.menu import MenuScene
+        self.app.scenes.set_scene(MenuScene(self.app))
 
     # =========================
     # EVENTS
@@ -111,12 +118,15 @@ class ModeSelectScene(Scene):
     # DRAW
     # =========================
     def draw(self, screen):
-        screen.blit(
-            self.bg,
-            self.bg.get_rect(
-                center=(self.app.width // 2, self.app.height // 2)
+        if self.bg:
+            screen.blit(
+                self.bg,
+                self.bg.get_rect(
+                    center=(self.app.width // 2, self.app.height // 2)
+                )
             )
-        )
+        else:
+            screen.fill((8, 30, 55))
 
         overlay = pygame.Surface(
             (self.app.width, self.app.height), pygame.SRCALPHA

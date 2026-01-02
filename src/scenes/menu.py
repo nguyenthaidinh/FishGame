@@ -1,65 +1,48 @@
+
 import pygame
 from src.core.scene import Scene
 from src.ui.image_button import ImageButton
 
 
-# =========================
-# Helper: scale cover background
-# =========================
 def scale_cover(image, w, h):
+    if image is None:
+        return None
     iw, ih = image.get_width(), image.get_height()
+    if iw <= 0 or ih <= 0:
+        return None
     scale = max(w / iw, h / ih)
     nw, nh = int(iw * scale), int(ih * scale)
     return pygame.transform.smoothscale(image, (nw, nh))
 
 
-# =========================
-# MENU SCENE
-# =========================
 class MenuScene(Scene):
     def on_enter(self, **kwargs):
-        # ==================================================
-        # 🎨 BACKGROUND
-        # ==================================================
-        bg_raw = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
-        self.bg = scale_cover(bg_raw, self.app.width, self.app.height)
+        # BG raw để rescale lại khi đổi size
+        self.bg_raw = self.app.assets.image("assets/bg/khungchoi_bg.jpg")
+        self.bg = scale_cover(self.bg_raw, self.app.width, self.app.height)
 
-        # ==================================================
-        # 🔤 FONTS
-        # ==================================================
-        self.title_font = self.app.assets.font(
-            "assets/fonts/Fredoka-Bold.ttf", 72
-        )
-        self.sub_font = self.app.assets.font(
-            "assets/fonts/Baloo2-Bold.ttf", 26
-        )
+        self.title_font = self.app.assets.font("assets/fonts/Fredoka-Bold.ttf", 72)
+        self.sub_font = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 26)
 
-        # ==================================================
-        # 🔊 SOUNDS
-        # ==================================================
-        self.click_sound = self.app.assets.sound(
-            "assets/sound/click.wav"
-        )
+        self.click_sound = self.app.assets.sound("assets/sound/click.wav")
 
-        # ==================================================
-        # 🎵 MENU BGM
-        # ==================================================
         if self.app.sound_on:
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load("assets/sound/bgm_game.mp3")
-            pygame.mixer.music.set_volume(0.4)
-            pygame.mixer.music.play(-1)
+            try:
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load("assets/sound/bgm_game.mp3")
+                pygame.mixer.music.set_volume(0.4)
+                pygame.mixer.music.play(-1)
+            except Exception as e:
+                print("[WARN] Menu BGM error:", e)
 
-        # ==================================================
-        # 📐 LAYOUT
-        # ==================================================
+        self._last_size = (self.app.width, self.app.height)
+        self._rebuild_layout()
+
+    def _rebuild_layout(self):
         cx = self.app.width // 2
         y0 = int(self.app.height * 0.38)
         gap = 95
 
-        # ==================================================
-        # 🟦 MAIN BUTTONS
-        # ==================================================
         self.buttons = [
             ImageButton(
                 "assets/ui/button/start.png",
@@ -99,9 +82,6 @@ class MenuScene(Scene):
             ),
         ]
 
-        # ==================================================
-        # 🔈 SOUND BUTTON (BOTTOM LEFT)
-        # ==================================================
         self.sound_button = ImageButton(
             "assets/ui/button/sound.png",
             (70, self.app.height - 90),
@@ -112,9 +92,6 @@ class MenuScene(Scene):
         )
         self.sound_button.use_alt = not self.app.sound_on
 
-        # ==================================================
-        # ⚙️ SETTING BUTTON (BOTTOM RIGHT)
-        # ==================================================
         self.setting_button = ImageButton(
             "assets/ui/button/setting.png",
             (self.app.width - 70, self.app.height - 90),
@@ -128,7 +105,10 @@ class MenuScene(Scene):
     # Navigation
     # =========================
     def _go_mode(self):
-        pygame.mixer.music.fadeout(600)
+        try:
+            pygame.mixer.music.fadeout(600)
+        except Exception:
+            pass
         from src.scenes.mode_select import ModeSelectScene
         self.app.scenes.set_scene(ModeSelectScene(self.app))
 
@@ -141,7 +121,7 @@ class MenuScene(Scene):
         self.app.scenes.set_scene(HistoryScene(self.app))
 
     def _go_setting(self):
-        # 👉 GẮN SETTINGS SCENE CŨ CỦA BẠN
+        # ✅ đúng theo project của Lio (settings ở core)
         from src.core.settings import SettingsScene
         self.app.scenes.set_scene(SettingsScene(self.app))
 
@@ -158,46 +138,35 @@ class MenuScene(Scene):
     # UPDATE
     # =========================
     def update(self, dt):
-        pass
+        # ✅ nếu fullscreen/windowed làm đổi size -> rescale bg + rebuild UI
+        cur = (self.app.width, self.app.height)
+        if cur != self._last_size:
+            self._last_size = cur
+            self.bg = scale_cover(self.bg_raw, self.app.width, self.app.height)
+            self._rebuild_layout()
+
+        # sync icon mute/unmute
+        self.sound_button.use_alt = not self.app.sound_on
 
     # =========================
     # DRAW
     # =========================
     def draw(self, screen):
-        # background
-        screen.blit(
-            self.bg,
-            self.bg.get_rect(
-                center=(self.app.width // 2, self.app.height // 2)
-            )
-        )
+        if self.bg:
+            screen.blit(self.bg, self.bg.get_rect(center=(self.app.width // 2, self.app.height // 2)))
+        else:
+            screen.fill((8, 30, 55))
 
-        # overlay
-        overlay = pygame.Surface(
-            (self.app.width, self.app.height), pygame.SRCALPHA
-        )
+        overlay = pygame.Surface((self.app.width, self.app.height), pygame.SRCALPHA)
         overlay.fill((0, 40, 80, 35))
         screen.blit(overlay, (0, 0))
 
-        # title
-        title = self.title_font.render(
-            "Blue Ocean", True, (255, 255, 255)
-        )
-        subtitle = self.sub_font.render(
-            "Một đại dương, một quy luật.",
-            True, (220, 240, 255)
-        )
+        title = self.title_font.render("Blue Ocean", True, (255, 255, 255))
+        subtitle = self.sub_font.render("Một đại dương, một quy luật.", True, (220, 240, 255))
 
-        screen.blit(
-            title,
-            title.get_rect(center=(self.app.width // 2, 140))
-        )
-        screen.blit(
-            subtitle,
-            subtitle.get_rect(center=(self.app.width // 2, 200))
-        )
+        screen.blit(title, title.get_rect(center=(self.app.width // 2, 140)))
+        screen.blit(subtitle, subtitle.get_rect(center=(self.app.width // 2, 200)))
 
-        # buttons
         for b in self.buttons:
             b.draw(screen)
 

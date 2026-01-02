@@ -2,5 +2,5 @@
   "id": 1,
   "name": "Map 1 - Vùng nông",
   "bg": "assets/bg/map1_bg.jpg",
-  "world_size": [3200, 1800]
+  "world_size": [2400, 1344]
 }
