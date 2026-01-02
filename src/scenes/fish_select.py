@@ -158,17 +158,17 @@ class FishSelectScene(Scene):
         # =========================
         self.btn_back = ImageButton(
             "assets/ui/button/back.png",
-            (80, 50),
+            (80, 40),
             self._go_back,          # ✅ FIX: không dùng self.app.back
-            scale=0.12,
+            scale=0.1,
             hover_scale=1.15
         )
 
         self.btn_start = ImageButton(
             "assets/ui/button/start.png",
-            (cx, 60),
+            (cx, 50),
             self._start,
-            scale=0.2,
+            scale=0.15,
             scale_x=1.6,
             scale_y=1.0,
             hover_scale=1.15
