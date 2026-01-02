@@ -1,8 +1,8 @@
 import pygame
 
 from src.core.scene import Scene
-from src.ui.button import Button
 from src.ui.panel import Panel
+from src.ui.image_button import ImageButton
 
 
 class PauseScene(Scene):
@@ -11,64 +11,76 @@ class PauseScene(Scene):
         self.game_scene = game_scene
 
     def on_enter(self, **kwargs):
-        # fonts
-        self.h1 = self.app.assets.font(None, 54)
-        self.btn_font = self.app.assets.font(None, 28)
-        self.small = self.app.assets.font(None, 18)
-
-        cx = self.app.width // 2
-        theme = self.app.theme
-
-        # Panel trung tâm
-        self.panel = Panel(
-            rect=(cx - 260, 260, 520, 360),
-            bg_color=(25, 30, 45),
-            alpha=210,
-            radius=18
+        # ==================================================
+        # 🔊 CLICK SOUND
+        # ==================================================
+        self.click_sound = self.app.assets.sound(
+            "assets/sound/click.wav"
         )
 
+        cx = self.app.width // 2
+
+        # ==================================================
+        # 📦 PANEL
+        # ==================================================
+        
+
+        # ==================================================
+        # 📐 LAYOUT
+        # ==================================================
+        y0 = 220
+        gap = 90
+
+        # ==================================================
+        # 🟦 IMAGE BUTTONS
+        # ==================================================
         self.buttons = [
-            Button(
-                (cx - 210, 320, 420, 62),
-                "RESUME",
+            ImageButton(
+                "assets/ui/button/retry.png",
+                (cx, y0),
                 self._resume,
-                self.btn_font,
-                theme
+                scale=0.22,
+                scale_x=2.0,
+                hover_scale=1.15,
+                click_sound=self.click_sound
             ),
-            Button(
-                (cx - 210, 395, 420, 62),
-                "RETRY",
+            ImageButton(
+                "assets/ui/button/resume.png",
+                (cx, y0 + gap),
                 self._retry,
-                self.btn_font,
-                theme
+                scale=0.2,
+                scale_x=2.0,
+                hover_scale=1.15,
+                click_sound=self.click_sound
             ),
-            Button(
-                (cx - 210, 470, 420, 62),
-                "MAP SELECT",
+            ImageButton(
+                "assets/ui/button/map_select.png",
+                (cx, y0 + gap * 2),
                 self._go_map_select,
-                self.btn_font,
-                theme
+                scale=0.2,
+                scale_x=2.0,
+                hover_scale=1.15,
+                click_sound=self.click_sound
             ),
-            Button(
-                (cx - 210, 545, 420, 62),
-                "MAIN MENU",
+            ImageButton(
+                "assets/ui/button/menu.png",
+                (cx, y0 + gap * 3),
                 self._go_menu,
-                self.btn_font,
-                theme
+                scale=0.2,
+                scale_x=2.0,
+                hover_scale=1.15,
+                click_sound=self.click_sound
             ),
         ]
 
-        for b in self.buttons:
-            self.panel.add(b)
-
     # =========================
-    # Actions (LAZY IMPORT)
+    # Actions
     # =========================
     def _resume(self):
         self.app.scenes.replace_scene(self.game_scene)
 
     def _retry(self):
-        from src.scenes.game_scene import GameScene  # ✅ import muộn
+        from src.scenes.game_scene import GameScene
 
         map_data = self.app.runtime.get("map")
         if not map_data:
@@ -86,11 +98,12 @@ class PauseScene(Scene):
         )
 
     def _go_menu(self):
-        from src.scenes.menu import MenuScene  # ✅ import muộn
+        pygame.mixer.music.fadeout(600)
+        from src.scenes.menu import MenuScene
         self.app.scenes.set_scene(MenuScene(self.app))
 
     def _go_map_select(self):
-        from src.scenes.map_select import MapSelectScene  # ✅ import muộn
+        from src.scenes.map_select import MapSelectScene
         self.app.scenes.set_scene(MapSelectScene(self.app))
 
     # =========================
@@ -108,27 +121,19 @@ class PauseScene(Scene):
     # Draw
     # =========================
     def draw(self, screen):
-        # gameplay phía sau (freeze frame)
+        # freeze gameplay
         self.game_scene.draw(screen)
 
-        overlay = pygame.Surface((self.app.width , self.app.height ), pygame.SRCALPHA)
+        # overlay tối
+        overlay = pygame.Surface(
+            (self.app.width, self.app.height),
+            pygame.SRCALPHA
+        )
         overlay.fill((0, 0, 0, 140))
         screen.blit(overlay, (0, 0))
 
-        self.panel.draw(screen)
+        
 
-        title = self.h1.render("PAUSED", True, self.app.theme["text"])
-        screen.blit(
-            title,
-            title.get_rect(center=(self.app.width // 2, 220))
-        )
-
-        hint = self.small.render(
-            "ESC to resume",
-            True,
-            self.app.theme["muted"]
-        )
-        screen.blit(
-            hint,
-            hint.get_rect(center=(self.app.width // 2, 250))
-        )
+        # buttons
+        for b in self.buttons:
+            b.draw(screen)
