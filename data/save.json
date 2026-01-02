@@ -28,6 +28,14 @@
   },
   "history": [
     {
+      "time": "2026-01-02 23:08:45",
+      "mode": 1,
+      "map_id": 1,
+      "points": 5,
+      "time_alive": 20.17100000000003,
+      "result": "LOSE"
+    },
+    {
       "time": "2026-01-02 21:35:46",
       "mode": 1,
       "map_id": 1,
@@ -221,8 +229,8 @@
     }
   ],
   "settings": {
-    "music": 0.6,
-    "sfx": 0.7,
-    "fullscreen": false
+    "music": 0.0,
+    "sfx": 0.0,
+    "fullscreen": true
   }
 }

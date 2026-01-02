@@ -25,7 +25,7 @@ class MenuScene(Scene):
         self.bg = scale_cover(bg_raw, self.app.width, self.app.height)
 
         # ==================================================
-        # 🔤 FONTS (HOẠT HÌNH)
+        # 🔤 FONTS
         # ==================================================
         self.title_font = self.app.assets.font(
             "assets/fonts/Fredoka-Bold.ttf", 72
@@ -42,13 +42,11 @@ class MenuScene(Scene):
         )
 
         # ==================================================
-        # 🎵 MENU BACKGROUND MUSIC
+        # 🎵 MENU BGM
         # ==================================================
         if self.app.sound_on:
             pygame.mixer.music.stop()
-            pygame.mixer.music.load(
-                "assets/sound/bgm_game.mp3"
-            )
+            pygame.mixer.music.load("assets/sound/bgm_game.mp3")
             pygame.mixer.music.set_volume(0.4)
             pygame.mixer.music.play(-1)
 
@@ -60,7 +58,7 @@ class MenuScene(Scene):
         gap = 95
 
         # ==================================================
-        # 🟦 BUTTONS
+        # 🟦 MAIN BUTTONS
         # ==================================================
         self.buttons = [
             ImageButton(
@@ -68,7 +66,7 @@ class MenuScene(Scene):
                 (cx, y0),
                 self._go_mode,
                 scale=0.2,
-                scale_x=1.5,          # kéo dài ngang
+                scale_x=1.5,
                 hover_scale=1.2,
                 click_sound=self.click_sound
             ),
@@ -102,7 +100,7 @@ class MenuScene(Scene):
         ]
 
         # ==================================================
-        # 🔈 SOUND TOGGLE BUTTON
+        # 🔈 SOUND BUTTON (BOTTOM LEFT)
         # ==================================================
         self.sound_button = ImageButton(
             "assets/ui/button/sound.png",
@@ -113,6 +111,18 @@ class MenuScene(Scene):
             click_sound=self.click_sound
         )
         self.sound_button.use_alt = not self.app.sound_on
+
+        # ==================================================
+        # ⚙️ SETTING BUTTON (BOTTOM RIGHT)
+        # ==================================================
+        self.setting_button = ImageButton(
+            "assets/ui/button/setting.png",
+            (self.app.width - 70, self.app.height - 90),
+            self._go_setting,
+            scale=0.11,
+            hover_scale=1.2,
+            click_sound=self.click_sound
+        )
 
     # =========================
     # Navigation
@@ -130,6 +140,11 @@ class MenuScene(Scene):
         from src.scenes.history import HistoryScene
         self.app.scenes.set_scene(HistoryScene(self.app))
 
+    def _go_setting(self):
+        # 👉 GẮN SETTINGS SCENE CŨ CỦA BẠN
+        from src.core.settings import SettingsScene
+        self.app.scenes.set_scene(SettingsScene(self.app))
+
     # =========================
     # EVENTS
     # =========================
@@ -137,6 +152,7 @@ class MenuScene(Scene):
         for b in self.buttons:
             b.handle_event(event)
         self.sound_button.handle_event(event)
+        self.setting_button.handle_event(event)
 
     # =========================
     # UPDATE
@@ -156,7 +172,7 @@ class MenuScene(Scene):
             )
         )
 
-        # overlay nhẹ
+        # overlay
         overlay = pygame.Surface(
             (self.app.width, self.app.height), pygame.SRCALPHA
         )
@@ -186,3 +202,4 @@ class MenuScene(Scene):
             b.draw(screen)
 
         self.sound_button.draw(screen)
+        self.setting_button.draw(screen)
