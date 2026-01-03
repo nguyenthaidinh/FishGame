@@ -55,7 +55,7 @@ class GameScene(Scene):
 
         # ===== Enemies / Drops =====
         self.preys = []
-        self.predators = []  # ✅ NEW
+        self.predators = []
         self.spawner = Spawner(self.world_w, self.world_h)
 
         self.drops = []
@@ -64,14 +64,16 @@ class GameScene(Scene):
         self.floating: List[FloatingText] = []
         self.elapsed = 0.0
 
-        # ===== Spawn limit theo diện tích =====
-        base_area = 3200 * 1800
-        cur_area = self.world_w * self.world_h
-        self.max_preys = int(90 * (cur_area / base_area))
-        self.max_preys = max(45, min(120, self.max_preys))
-
-        # predator cap (ít hơn prey)
-        self.max_predators = max(6, min(18, int(self.max_preys * 0.18)))
+        # ===== Spawn caps theo map/mode (EASY BALANCE) =====
+        if self.map_id == 1:
+            self.max_preys = 22 if self.mode == 1 else 28
+            self.max_predators = 2 if self.mode == 1 else 3
+        elif self.map_id == 2:
+            self.max_preys = 28 if self.mode == 1 else 36
+            self.max_predators = 3 if self.mode == 1 else 4
+        else:  # map3+
+            self.max_preys = 34 if self.mode == 1 else 44
+            self.max_predators = 4 if self.mode == 1 else 5
 
         # ===== Camera init =====
         self._camera_follow_players()
@@ -102,7 +104,7 @@ class GameScene(Scene):
         p1_fish = self.app.save.data.get("selected_fish_p1", "fish01")
         p2_fish = self.app.save.data.get("selected_fish_p2", "fish02")
 
-        # ✅ 1P: mũi tên
+        # 1P: arrows
         p1_controls = {
             "up": pygame.K_UP,
             "down": pygame.K_DOWN,
@@ -110,7 +112,7 @@ class GameScene(Scene):
             "right": pygame.K_RIGHT,
         }
 
-        # ✅ 2P: WASD
+        # 2P: WASD
         p2_controls = {
             "up": pygame.K_w,
             "down": pygame.K_s,
@@ -165,6 +167,29 @@ class GameScene(Scene):
     def _all_dead(self) -> bool:
         return all(p.lives <= 0 for p in self.players)
 
+    # ✅ DESPAWN xa camera để cá không tích tụ mãi
+    def _despawn_far_entities(self):
+        view_l = self.camera.offset.x
+        view_r = self.camera.offset.x + self.camera.sw
+        view_t = self.camera.offset.y
+        view_b = self.camera.offset.y + self.camera.sh
+
+        pad = 520  # càng lớn càng ít despawn (520 là cân bằng)
+        left = view_l - pad
+        right = view_r + pad
+        top = view_t - pad
+        bottom = view_b + pad
+
+        for e in self.preys:
+            if getattr(e, "alive", True):
+                if e.pos.x < left or e.pos.x > right or e.pos.y < top or e.pos.y > bottom:
+                    e.alive = False
+
+        for e in self.predators:
+            if getattr(e, "alive", True):
+                if e.pos.x < left or e.pos.x > right or e.pos.y < top or e.pos.y > bottom:
+                    e.alive = False
+
     # =========================
     # Pause
     # =========================
@@ -203,8 +228,13 @@ class GameScene(Scene):
         self._camera_follow_players()
         self.camera.update(dt)
 
-        # difficulty points (giữ logic cũ: dựa P1)
-        avg_pts = int(self.players[0].points)
+        # difficulty points:
+        # - 1P: dùng điểm player[0]
+        # - 2P: dùng trung bình team để spawn hợp lý hơn
+        if self.mode == 1:
+            diff_pts = int(self.players[0].points)
+        else:
+            diff_pts = max(1, int(self._team_points() / max(1, len(self.players))))
 
         # update prey
         for prey in self.preys:
@@ -214,12 +244,14 @@ class GameScene(Scene):
         for pr in self.predators:
             pr.update(dt, self.world_w, self.world_h, players=self.players)
 
-        # spawn
-        if len(self.preys) < self.max_preys or len(self.predators) < self.max_predators:
-            # ✅ signature mới
+        # spawn: ✅ theo TỔNG cap (tránh OR spawn miết)
+        total_now = len(self.preys) + len(self.predators)
+        total_cap = self.max_preys + self.max_predators
+
+        if total_now < total_cap:
             self.spawner.update(
                 dt,
-                player_points=avg_pts,
+                player_points=diff_pts,
                 preys=self.preys,
                 predators=self.predators,
                 camera=self.camera,
@@ -227,12 +259,15 @@ class GameScene(Scene):
             )
 
         # drops
-        self.drop_spawner.update(dt, self.drops, self.map_id, avg_pts)
+        self.drop_spawner.update(dt, self.drops, self.map_id, diff_pts)
         for d in self.drops:
             d.update(dt, self.world_w, self.world_h)
 
         # collision
         self._handle_collisions()
+
+        # ✅ despawn xa camera (giảm đông dần theo thời gian)
+        self._despawn_far_entities()
 
         # cleanup
         self.preys = [e for e in self.preys if getattr(e, "alive", True)]
@@ -263,10 +298,20 @@ class GameScene(Scene):
                         p.hit()
                         self.camera.shake(6, 0.15)
 
-            # ===== predator collisions (NEW) =====
+            # ===== predator collisions (EASY FAIR RULE) =====
             for pr in self.predators:
-                if getattr(pr, "alive", True) and p_rect.colliderect(pr.rect()):
-                    # predator luôn gây damage (player không “ăn” predator ở bản này)
+                if not getattr(pr, "alive", True):
+                    continue
+                if not p_rect.colliderect(pr.rect()):
+                    continue
+
+                # ✅ đủ lớn thì ăn predator (công bằng)
+                if pr.points <= int(p.points * 0.92):
+                    pr.alive = False
+                    gained = p.add_points(pr.points)
+                    self.floating.append(FloatingText(pr.pos, f"+{gained}"))
+                    self.camera.shake(6, 0.12)
+                else:
                     p.hit()
                     self.camera.shake(10, 0.22)
 
@@ -337,11 +382,9 @@ class GameScene(Scene):
         for d in self.drops:
             d.draw(screen, self.camera, self.app.assets)
 
-        # draw prey
         for prey in self.preys:
             prey.draw(screen, self.camera, self.app.assets, self.font_small)
 
-        # draw predator (NEW)
         for pr in self.predators:
             pr.draw(screen, self.camera, self.font_small)
 

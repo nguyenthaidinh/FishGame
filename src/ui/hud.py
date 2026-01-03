@@ -1,22 +1,28 @@
 # src/ui/hud.py
 import pygame
 
-# =========================
-# Helpers: text outline
-# =========================
+
+# =========================================================
+# Text helpers (outline)
+# =========================================================
 def render_outline(font, text, fill=(245, 250, 255), outline=(0, 0, 0)):
     base = font.render(text, True, fill)
     out = font.render(text, True, outline)
     return base, out
 
+
 def blit_outline(screen, base, out, x, y, thick=2):
-    for ox, oy in [(-thick,0),(thick,0),(0,-thick),(0,thick),(-thick,-thick),(thick,-thick),(-thick,thick),(thick,thick)]:
-        screen.blit(out, (x+ox, y+oy))
+    for ox, oy in [
+        (-thick, 0), (thick, 0), (0, -thick), (0, thick),
+        (-thick, -thick), (thick, -thick), (-thick, thick), (thick, thick)
+    ]:
+        screen.blit(out, (x + ox, y + oy))
     screen.blit(base, (x, y))
 
-# =========================
-# Helpers: icons
-# =========================
+
+# =========================================================
+# Icon helpers
+# =========================================================
 def scale_icon(img: pygame.Surface, size: int) -> pygame.Surface:
     if img is None:
         return None
@@ -25,6 +31,7 @@ def scale_icon(img: pygame.Surface, size: int) -> pygame.Surface:
         return img
     s = float(size) / float(max(w, h))
     return pygame.transform.smoothscale(img, (int(w * s), int(h * s)))
+
 
 def draw_icon(screen, img, cx, cy, size, alpha=255):
     if img is None:
@@ -37,70 +44,39 @@ def draw_icon(screen, img, cx, cy, size, alpha=255):
         icon.set_alpha(alpha)
     screen.blit(icon, icon.get_rect(center=(int(cx), int(cy))))
 
-# =========================
-# Helpers: fancy panel + bar
-# =========================
-def draw_panel(screen, rect: pygame.Rect):
-    # shadow
-    shadow = pygame.Surface((rect.w + 18, rect.h + 18), pygame.SRCALPHA)
-    pygame.draw.rect(shadow, (0, 0, 0, 95), shadow.get_rect(), border_radius=26)
-    screen.blit(shadow, (rect.x - 9, rect.y + 9))
 
-    # base panel
-    panel = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA)
-    pygame.draw.rect(panel, (10, 18, 30, 205), panel.get_rect(), border_radius=24)
-
-    # top highlight (glass)
-    hi = pygame.Surface((rect.w, rect.h), pygame.SRCALPHA)
-    pygame.draw.rect(hi, (255, 255, 255, 26), pygame.Rect(0, 0, rect.w, int(rect.h * 0.45)), border_radius=24)
-    panel.blit(hi, (0, 0))
-
-    # border
-    pygame.draw.rect(panel, (110, 210, 255, 120), panel.get_rect(), width=2, border_radius=24)
-
-    screen.blit(panel, rect.topleft)
-
-def draw_progress_bar(screen, rect: pygame.Rect, ratio: float):
-    ratio = 0.0 if ratio < 0 else 1.0 if ratio > 1 else ratio
-    r = rect.h // 2
-
-    # bg
-    pygame.draw.rect(screen, (6, 10, 16), rect, border_radius=r)
-    pygame.draw.rect(screen, (255, 255, 255), rect, width=2, border_radius=r)
-
-    # fill
-    fill_w = max(0, int(rect.w * ratio))
-    if fill_w > 0:
-        fill = pygame.Rect(rect.x, rect.y, fill_w, rect.h)
-        pygame.draw.rect(screen, (70, 220, 255), fill, border_radius=r)
-
-        # shine line
-        shine = pygame.Surface((fill_w, rect.h), pygame.SRCALPHA)
-        pygame.draw.rect(shine, (255, 255, 255, 55), pygame.Rect(0, 0, fill_w, rect.h // 2), border_radius=r)
-        screen.blit(shine, (rect.x, rect.y))
-
-def draw_divider(screen, x, y, h):
-    # đường chia mảnh + mờ
-    pygame.draw.line(screen, (255, 255, 255), (x, y), (x, y + h), 1)
-    overlay = pygame.Surface((2, h), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 110))
-    screen.blit(overlay, (x - 1, y))
-
-# =========================
+# =========================================================
 # HUD
-# =========================
+# =========================================================
 class HUD:
+    """
+    HUD (panel PNG + vẽ text/icon nằm TRONG panel):
+    - Hàng trên: Score + Map/Time
+    - Hàng dưới: Hearts + Buff slots
+    - Không vẽ khung đen/đổ bóng ngoài (panel đã có viền đẹp)
+    """
+
     def __init__(self, font_big, font_small):
         self.font_big = font_big
         self.font_small = font_small
+
         self._loaded = False
 
+        # panel image
+        self.panel_img = None
+        self._panel_cache_size = None
+        self._panel_cache_scaled = None
+
+        # icons
         self.ico_heart_full = None
         self.ico_heart_empty = None
         self.ico_x2 = None
         self.ico_sh1 = None
         self.ico_sh2 = None
         self.ico_sh3 = None
+
+        # optional: empty slot icon (nếu có)
+        self.ico_slot = None
 
     def _safe_image(self, assets, path):
         try:
@@ -113,100 +89,173 @@ class HUD:
             return
         self._loaded = True
 
-        # ✅ Lio đang có icon ở đây (theo ảnh folder Lio gửi)
-        self.ico_heart_full  = self._safe_image(assets, "assets/ui/button/heart_full.png")
+        # ✅ panel của Lio
+        self.panel_img = self._safe_image(assets, "assets/ui/hud/panel.png")
+
+        # ✅ heart icons (đúng folder Lio đang có)
+        self.ico_heart_full = self._safe_image(assets, "assets/ui/button/heart_full.png")
         self.ico_heart_empty = self._safe_image(assets, "assets/ui/button/heart_empty.png")
 
+        # ✅ buff icons
         self.ico_x2 = self._safe_image(assets, "assets/ui/items/x2diem.png")
         self.ico_sh1 = self._safe_image(assets, "assets/ui/items/thuong1.png")
         self.ico_sh2 = self._safe_image(assets, "assets/ui/items/thuong2.png")
         self.ico_sh3 = self._safe_image(assets, "assets/ui/items/thuong3.png")
 
-    def draw(self, screen, assets, lives, points, elapsed, target, player=None, map_name=""):
+        # nếu Lio có icon slot rỗng thì đặt path tại đây (không có cũng không sao)
+        # self.ico_slot = self._safe_image(assets, "assets/ui/hud/slot.png")
+
+    def _panel_scaled(self, w, h):
+        """
+        Cache panel scale để không smoothscale mỗi frame.
+        """
+        if self.panel_img is None:
+            return None
+
+        key = (int(w), int(h))
+        if self._panel_cache_size == key and self._panel_cache_scaled is not None:
+            return self._panel_cache_scaled
+
+        self._panel_cache_size = key
+        self._panel_cache_scaled = pygame.transform.smoothscale(self.panel_img, key)
+        return self._panel_cache_scaled
+
+    def draw(
+        self,
+        screen,
+        assets,
+        lives: int,
+        points: int,
+        elapsed: float,
+        target: int,
+        player=None,
+        map_name: str = "",
+    ):
         self._ensure_assets(assets)
 
         sw, sh = screen.get_width(), screen.get_height()
 
-        # ===== Panel size (co giãn theo màn hình) =====
-        panel_w = min(760, int(sw * 0.62))
-        panel_h = 112
-        panel = pygame.Rect(18, 14, panel_w, panel_h)
+        # =========================================================
+        # PANEL: nhỏ lại + ngắn lại (đẹp, gọn)
+        # =========================================================
+        panel_w = min(520, int(sw * 0.58))  # ✅ ngắn lại
+        panel_h = 92                        # ✅ thấp lại
+        panel_x = 18
+        panel_y = 12
+        panel_rect = pygame.Rect(panel_x, panel_y, panel_w, panel_h)
 
-        draw_panel(screen, panel)
+        # vẽ panel PNG
+        panel_surf = self._panel_scaled(panel_w, panel_h)
+        if panel_surf:
+            screen.blit(panel_surf, panel_rect.topleft)
+        else:
+            # fallback nếu thiếu panel.png
+            fallback = pygame.Surface((panel_w, panel_h), pygame.SRCALPHA)
+            pygame.draw.rect(fallback, (10, 18, 30, 210), fallback.get_rect(), border_radius=20)
+            pygame.draw.rect(fallback, (110, 210, 255, 140), fallback.get_rect(), width=2, border_radius=20)
+            screen.blit(fallback, panel_rect.topleft)
 
-        # ===== Layout columns =====
-        pad = 18
-        left_w = 170          # hearts + small labels
-        right_w = 170         # buffs
-        mid_w = panel.w - (pad*2 + left_w + right_w)
+        # =========================================================
+        # LAYOUT "TRONG PANEL"
+        # Dùng tỉ lệ theo panel để không bị lệch khi đổi size
+        # =========================================================
+        x0, y0, w0, h0 = panel_rect.x, panel_rect.y, panel_rect.w, panel_rect.h
 
-        left_x = panel.x + pad
-        mid_x  = left_x + left_w
-        right_x = mid_x + mid_w
+        # vùng "ruột" (tránh góc trang trí)
+        inner_l = x0 + int(w0 * 0.06)  # tránh icon cua bên trái
+        inner_r = x0 + int(w0 * 0.94)  # tránh sò bên phải
+        inner_w = inner_r - inner_l
 
-        draw_divider(screen, mid_x - 10, panel.y + 18, panel.h - 36)
-        draw_divider(screen, right_x - 10, panel.y + 18, panel.h - 36)
+        # hàng trên / dưới
+        top_y = y0 + int(h0 * 0.18)
+        bottom_y = y0 + int(h0 * 0.66)
 
-        # ===== Hearts (to hơn) =====
-        max_lives = 3
-        lives = int(lives)
-        heart_size = 30
-        hx = left_x + 18
-        hy = panel.y + 34
-        gap = 40
-        for i in range(max_lives):
-            img = self.ico_heart_full if i < lives else self.ico_heart_empty
-            draw_icon(screen, img, hx + i * gap, hy, heart_size)
+        # =========================================================
+        # TOP: SCORE + MAP/TIME
+        # =========================================================
+        score_text = f"{int(points)} / {int(target)}"
+        score_base, score_out = render_outline(
+            self.font_big,
+            score_text,
+            fill=(245, 252, 255),
+            outline=(0, 0, 0),
+        )
 
-        # ===== Score text =====
-        pts_str = f"{int(points)} / {int(target)}"
-        base, out = render_outline(self.font_big, pts_str, (245, 252, 255), (0, 0, 0))
-        blit_outline(screen, base, out, mid_x, panel.y + 16, thick=2)
+        # score nằm trong ruột panel
+        score_x = inner_l + 40 
+        score_y = top_y + 4 
+        blit_outline(screen, score_base, score_out, score_x, score_y, thick=2)
 
-        # ===== Progress bar (dày + đẹp) =====
-        ratio = (float(points) / float(target)) if target else 0.0
-        bar = pygame.Rect(mid_x, panel.y + 52, max(120, int(mid_w * 0.82)), 18)
-        draw_progress_bar(screen, bar, ratio)
-
-        # ===== Map + Time =====
         mm = int(elapsed) // 60
         ss = int(elapsed) % 60
         line = f"Time {mm:02d}:{ss:02d}"
         if map_name:
-            line = f"{map_name}  |  {line}"
+            line = f"{map_name} | {line}"
 
-        txt = self.font_small.render(line, True, (205, 225, 242))
-        shd = self.font_small.render(line, True, (0, 0, 0))
-        screen.blit(shd, (mid_x + 1, panel.y + 78 + 1))
-        screen.blit(txt, (mid_x, panel.y + 78))
+        # time nằm cùng hàng, bên phải score
+        # canh sao cho vẫn nằm trong ruột panel
+        time_base, time_out = render_outline(
+            self.font_small,
+            line,
+            fill=(215, 232, 245),
+            outline=(0, 0, 0),
+        )
+        time_x = inner_l + int(inner_w * 0.30)
+        time_y = top_y + 4
+        blit_outline(screen, time_base, time_out, time_x, time_y, thick=1)
 
-        # ===== Buff area (right) =====
+        # =========================================================
+        # BOTTOM: HEARTS (to hơn) + BUFF SLOTS
+        # =========================================================
+        max_lives = 3
+        lives = int(lives)
+
+        heart_size = 48      
+        heart_gap = 36
+        hearts_x = inner_l + int(inner_w * 0.02) + 180
+
+        for i in range(max_lives):
+            img = self.ico_heart_full if i < lives else self.ico_heart_empty
+            draw_icon(
+                screen,
+                img,
+                hearts_x + i * heart_gap,
+                bottom_y,
+                heart_size
+            )
+
+        # ===== Buff slots bên phải (2 ô) =====
+        slot_size = 28
+        slot_gap = 42
+        slots_count = 2
+
+        # slot area sát phải, vẫn nằm trong ruột panel
+        slots_right = inner_r - int(inner_w * 0.02) - 50
+        slot_centers = []
+        for i in range(slots_count):
+            cx = slots_right - i * slot_gap
+            slot_centers.append(cx)
+
+        # vẽ slot nền (nếu không có icon slot thì vẽ hình rounded)
+        for cx in slot_centers:
+            if self.ico_slot:
+                draw_icon(screen, self.ico_slot, cx, bottom_y, slot_size, alpha=255)
+            else:
+                slot_rect = pygame.Rect(0, 0, slot_size, slot_size)
+                slot_rect.center = (int(cx), int(bottom_y))
+                # nền slot nhẹ, nhìn “game UI”
+                s = pygame.Surface((slot_size, slot_size), pygame.SRCALPHA)
+                pygame.draw.rect(s, (0, 0, 0, 70), s.get_rect(), border_radius=10)
+                pygame.draw.rect(s, (255, 255, 255, 70), s.get_rect(), width=2, border_radius=10)
+                screen.blit(s, slot_rect.topleft)
+
+        # ===== đặt buff icons vào slot (ưu tiên x2 rồi shield) =====
         if player:
-            bx = right_x + right_w - 24
-            by = panel.y + 34
-            icon_size = 28
-            step = 54
-
-            def draw_buff(img, seconds, label_color=(255, 235, 170)):
-                nonlocal bx
-                if img is None:
-                    bx -= step
-                    return
-                draw_icon(screen, img, bx, by, icon_size)
-                # time badge
-                if seconds > 0:
-                    s = f"{seconds:.0f}s"
-                    t = self.font_small.render(s, True, label_color)
-                    o = self.font_small.render(s, True, (0, 0, 0))
-                    rx = bx - t.get_width() // 2
-                    ry = by + 18
-                    screen.blit(o, (rx + 1, ry + 1))
-                    screen.blit(t, (rx, ry))
-                bx -= step
+            buffs = []
 
             x2_time = float(getattr(player, "x2_time", 0.0))
             if x2_time > 0:
-                draw_buff(self.ico_x2, x2_time, (255, 235, 170))
+                buffs.append(("x2", self.ico_x2, x2_time))
 
             inv = float(getattr(player, "invincible_time", 0.0))
             tier = int(getattr(player, "shield_tier", 0))
@@ -216,4 +265,18 @@ class HUD:
                     ico = self.ico_sh2
                 elif tier == 3:
                     ico = self.ico_sh3
-                draw_buff(ico, inv, (140, 210, 255))
+                buffs.append(("sh", ico, inv))
+
+            # draw buffs vào slot (tối đa 2)
+            for idx, (kind, img, secs) in enumerate(buffs[:slots_count]):
+                cx = slot_centers[idx]
+                draw_icon(screen, img, cx, bottom_y, slot_size - 4, alpha=255)
+
+                # badge thời gian nhỏ phía dưới icon
+                badge = f"{secs:.0f}s"
+                b = self.font_small.render(badge, True, (255, 245, 190))
+                o = self.font_small.render(badge, True, (0, 0, 0))
+                bx = int(cx - b.get_width() / 2)
+                by = int(bottom_y + slot_size * 0.38)
+                screen.blit(o, (bx + 1, by + 1))
+                screen.blit(b, (bx, by))
