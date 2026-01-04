@@ -19,7 +19,7 @@
     "fish11",
     "fish12"
   ],
-  "selected_fish_p1": "fish03",
+  "selected_fish_p1": "fish12",
   "selected_fish_p2": "fish03",
   "highscores": {
     "1": 3983,
@@ -27,6 +27,54 @@
     "3": 5025
   },
   "history": [
+    {
+      "time": "2026-01-04 15:48:31",
+      "mode": 1,
+      "map_id": 1,
+      "points": 246,
+      "time_alive": 47.77199999999945,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-04 15:47:34",
+      "mode": 1,
+      "map_id": 1,
+      "points": 379,
+      "time_alive": 67.58600000000024,
+      "result": "LOSE"
+    },
+    {
+      "time": "2026-01-04 15:42:05",
+      "mode": 1,
+      "map_id": 1,
+      "points": 798,
+      "time_alive": 60.45000000000001,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-04 15:40:36",
+      "mode": 1,
+      "map_id": 1,
+      "points": 995,
+      "time_alive": 63.96000000000014,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-04 15:37:25",
+      "mode": 1,
+      "map_id": 1,
+      "points": 514,
+      "time_alive": 48.96899999999942,
+      "result": "WIN"
+    },
+    {
+      "time": "2026-01-04 15:13:20",
+      "mode": 1,
+      "map_id": 1,
+      "points": 507,
+      "time_alive": 40.6019999999992,
+      "result": "WIN"
+    },
     {
       "time": "2026-01-03 15:51:59",
       "mode": 1,
@@ -378,59 +426,11 @@
       "points": 5,
       "time_alive": 0.5710000000000001,
       "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:41:51",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 0.559,
-      "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:41:46",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 0.567,
-      "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:41:43",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 7.279999999999997,
-      "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:38:27",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 12.815,
-      "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:35:31",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 0.5570000000000002,
-      "result": "LOSE"
-    },
-    {
-      "time": "2026-01-02 20:35:11",
-      "mode": 1,
-      "map_id": 1,
-      "points": 5,
-      "time_alive": 19.94400000000004,
-      "result": "LOSE"
     }
   ],
   "settings": {
     "music": 0.0,
     "sfx": 0.0,
-    "fullscreen": true
+    "fullscreen": false
   }
 }

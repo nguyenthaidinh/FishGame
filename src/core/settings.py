@@ -8,7 +8,7 @@ from src.ui.image_button import ImageButton
 # CORE SETTINGS
 # =========================
 class Settings:
-    TITLE = "BIG FISH"
+    TITLE = "NHOM 2 - CNTT K22"
     WIDTH = 1280
     HEIGHT = 720
     FPS = 60

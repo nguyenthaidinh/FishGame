@@ -82,7 +82,7 @@ class GameScene(Scene):
         # ===== BGM =====
         if self.app.sound_on:
             try:
-                pygame.mixer.music.load("assets/sound/bgm_game.mp3")
+                pygame.mixer.music.load("assets/sound/map.mp3")
                 pygame.mixer.music.set_volume(0.35)
                 pygame.mixer.music.play(-1)
             except Exception as e:
@@ -167,7 +167,7 @@ class GameScene(Scene):
     def _all_dead(self) -> bool:
         return all(p.lives <= 0 for p in self.players)
 
-    # ✅ DESPAWN xa camera để cá không tích tụ mãi
+    # DESPAWN xa camera để cá không tích tụ mãi
     def _despawn_far_entities(self):
         view_l = self.camera.offset.x
         view_r = self.camera.offset.x + self.camera.sw
@@ -244,7 +244,7 @@ class GameScene(Scene):
         for pr in self.predators:
             pr.update(dt, self.world_w, self.world_h, players=self.players)
 
-        # spawn: ✅ theo TỔNG cap (tránh OR spawn miết)
+        # spawn: theo TỔNG cap (tránh OR spawn miết)
         total_now = len(self.preys) + len(self.predators)
         total_cap = self.max_preys + self.max_predators
 
