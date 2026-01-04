@@ -49,7 +49,7 @@ class HistoryScene(Scene):
         )
 
         # ===== HISTORY DATA =====
-        # ✅ SaveManager thường insert(0) => mới nhất đã ở đầu list
+        # SaveManager thường insert(0) => mới nhất đã ở đầu list
         self.history = self.app.save.data.get("history", [])
 
         # ===== PANEL =====

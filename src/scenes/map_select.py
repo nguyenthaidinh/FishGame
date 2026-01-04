@@ -171,8 +171,6 @@ class MapSelectScene(Scene):
 
         self.selected_index = 0
 
-        # BACK BUTTON = IMAGE (dùng đúng ảnh Lio có)
-        # ảnh Lio: assets/ui/button/back.png
         # đặt "center" để ImageButton hoạt động
         back_img_path = "assets/ui/button/back.png"
         back_raw = pygame.image.load(back_img_path).convert_alpha()

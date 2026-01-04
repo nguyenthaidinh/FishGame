@@ -159,4 +159,4 @@ class LeaderboardScene(Scene):
         screen.blit(hint, (70, 620))
 
         # ===== BACK =====
-        self.btn_back.draw(screen)
+        self.btn_back.draw(screen) 

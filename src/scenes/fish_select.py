@@ -40,7 +40,6 @@ class FishCard:
         self.folder = folder
         self.unlocked = unlocked
 
-        # ⚠️ nếu thiếu sprite file -> sẽ crash
         self.sprite = AnimatedSprite(
             [f"{folder}/swim_01.png", f"{folder}/swim_02.png"],
             fps=8
@@ -112,8 +111,6 @@ class FishSelectScene(Scene):
         self.h1 = self.app.assets.font("assets/fonts/Fredoka-Bold.ttf", 46)
         self.font = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 22)
         self.small = self.app.assets.font("assets/fonts/Baloo2-Bold.ttf", 18)
-
-        # mode (nếu Lio đã chọn 1P/2P ở mode_select)
         # - nếu chưa có, mặc định 1P
         self.mode = int(self.app.runtime.get("mode", 1))
 
@@ -159,7 +156,7 @@ class FishSelectScene(Scene):
         self.btn_back = ImageButton(
             "assets/ui/button/back.png",
             (80, 40),
-            self._go_back,          # ✅ FIX: không dùng self.app.back
+            self._go_back,      
             scale=0.1,
             hover_scale=1.15
         )
@@ -175,10 +172,9 @@ class FishSelectScene(Scene):
         )
 
     # =========================
-    # Back (✅ FIX)
+    # Back 
     # =========================
     def _go_back(self):
-        # quay về map_select (đúng flow của Lio)
         from src.scenes.map_select import MapSelectScene
         self.app.scenes.set_scene(MapSelectScene(self.app))
 

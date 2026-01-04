@@ -66,8 +66,7 @@ class ModeSelectScene(Scene):
             ImageButton(
                 "assets/ui/button/back.png",
                 (cx, y0 + gap * 3.0),
-                self._go_menu,     # ✅ FIX: không dùng app.back
-                scale=0.18,
+                self._go_menu,     
                 scale_x=1.4,
                 hover_scale=1.12,
                 click_sound=self.click_sound

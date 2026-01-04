@@ -107,7 +107,7 @@ class PlayerFish:
             if self._pop < 0:
                 self._pop = 0.0
 
-        # ✅ scale bám nhanh để thấy lớn rõ
+        # scale bám nhanh để thấy lớn rõ
         self.scale += (target - self.scale) * 0.40
 
     # =========================
@@ -203,7 +203,6 @@ class PlayerFish:
             self._label_cache_key = None
 
     def _label_color(self):
-        # ✅ giữ đúng màu Lio muốn (không đổi)
         return (210, 255, 245)
 
     def _get_label_surface(self) -> pygame.Surface:
@@ -233,7 +232,7 @@ class PlayerFish:
     # RING (glow) - CHỈ KHI ĂN THƯỞNG KHIÊN/BẤT TỬ
     # =========================
     def _draw_ring(self, screen, rect: pygame.Rect):
-        # ✅ CHỈ HIỆN KHI ĂN THƯỞNG (không hiện khi va chạm mất máu)
+        # CHỈ HIỆN KHI ĂN THƯỞNG (không hiện khi va chạm mất máu)
         # (fix logic: chỉ cần invincible_time > 0 là đủ)
         if self.invincible_time <= 0:
             return
@@ -274,7 +273,6 @@ class PlayerFish:
 
         rect = img.get_rect(center=camera.world_to_screen(self.pos))
 
-        # ✅ FIX "giật giật" khi mất máu:
         # không return ẩn/hiện nữa, mà nhấp nháy bằng alpha (nhẹ hơn)
         if self.invincible > 0:
             t = pygame.time.get_ticks() / 1000.0

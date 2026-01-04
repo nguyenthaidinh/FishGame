@@ -166,7 +166,7 @@ class SettingsScene(Scene):
         self.app.scenes.set_scene(MenuScene(self.app))
 
     # =========================
-    # Apply settings (✅ FIX fullscreen)
+    # Apply settings 
     # =========================
     def _apply(self):
         self.music = float(self.slider_music.value)
@@ -195,10 +195,10 @@ class SettingsScene(Scene):
 
         self.app.screen = pygame.display.set_mode(new_size, flags)
 
-        # ✅ QUAN TRỌNG: update size để mọi scene dùng đúng
+        # update size để mọi scene dùng đúng
         self.app.width, self.app.height = self.app.screen.get_size()
 
-        # ✅ rebuild lại UI theo size mới
+        # rebuild lại UI theo size mới
         self._rebuild_layout()
 
         self.toast = "Applied!"

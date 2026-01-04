@@ -89,21 +89,16 @@ class HUD:
             return
         self._loaded = True
 
-        # ✅ panel của Lio
         self.panel_img = self._safe_image(assets, "assets/ui/hud/panel.png")
 
-        # ✅ heart icons (đúng folder Lio đang có)
         self.ico_heart_full = self._safe_image(assets, "assets/ui/button/heart_full.png")
         self.ico_heart_empty = self._safe_image(assets, "assets/ui/button/heart_empty.png")
 
-        # ✅ buff icons
         self.ico_x2 = self._safe_image(assets, "assets/ui/items/x2diem.png")
         self.ico_sh1 = self._safe_image(assets, "assets/ui/items/thuong1.png")
         self.ico_sh2 = self._safe_image(assets, "assets/ui/items/thuong2.png")
         self.ico_sh3 = self._safe_image(assets, "assets/ui/items/thuong3.png")
 
-        # nếu Lio có icon slot rỗng thì đặt path tại đây (không có cũng không sao)
-        # self.ico_slot = self._safe_image(assets, "assets/ui/hud/slot.png")
 
     def _panel_scaled(self, w, h):
         """

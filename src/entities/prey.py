@@ -130,7 +130,6 @@ class PreyFish(Entity):
             self.vel = self.vel.normalize() * self.base_speed
 
     def _update_dart(self, dt):
-        # nền: vẫn wander nhưng turn nhanh hơn
         self._turn_t += dt
         if self._turn_t >= 0.55:
             self._turn_t = 0.0

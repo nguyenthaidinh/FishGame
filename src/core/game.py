@@ -72,7 +72,7 @@ class GameApp:
         self.scenes.set_scene(BootScene(self))
 
     # ==================================================
-    # SOUND CONTROL  ⭐⭐ QUAN TRỌNG ⭐⭐
+    # SOUND CONTROL 
     # ==================================================
     def set_sound(self, on: bool):
         self.sound_on = on

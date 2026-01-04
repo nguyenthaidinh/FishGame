@@ -266,7 +266,7 @@ class GameScene(Scene):
         # collision
         self._handle_collisions()
 
-        # ✅ despawn xa camera (giảm đông dần theo thời gian)
+        # despawn xa camera (giảm đông dần theo thời gian)
         self._despawn_far_entities()
 
         # cleanup

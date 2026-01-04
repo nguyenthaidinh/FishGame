@@ -40,7 +40,7 @@ class PredatorFish:
         self.speed = 125.0 + (p_vis / 320.0) * 120.0
         self.speed = max(120.0, min(self.speed, 255.0))
 
-        # boss nhanh hơn chút (không quá gắt)
+        # boss nhanh hơn chút 
         if self.is_boss:
             self.speed = min(self.speed * 1.15, 310.0)
 

@@ -228,7 +228,7 @@ class Spawner:
             pts = int(enemy.get("points", 80))
             is_boss = bool(enemy.get("boss", False)) or (pts >= 500)
 
-            # ✅ Boss hiếm: cho phép "vượt cap" thêm 1 con (để có lúc cực kịch tính)
+            # Boss hiếm: cho phép "vượt cap" thêm 1 con (để có lúc cực kịch tính)
             # nhưng chỉ khi spawn đúng boss
             if len(predators) >= max_pred:
                 if not is_boss or len(predators) >= (max_pred + 1):

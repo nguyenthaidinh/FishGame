@@ -121,7 +121,6 @@ class MenuScene(Scene):
         self.app.scenes.set_scene(HistoryScene(self.app))
 
     def _go_setting(self):
-        # ✅ đúng theo project của Lio (settings ở core)
         from src.core.settings import SettingsScene
         self.app.scenes.set_scene(SettingsScene(self.app))
 
@@ -138,7 +137,6 @@ class MenuScene(Scene):
     # UPDATE
     # =========================
     def update(self, dt):
-        # ✅ nếu fullscreen/windowed làm đổi size -> rescale bg + rebuild UI
         cur = (self.app.width, self.app.height)
         if cur != self._last_size:
             self._last_size = cur
