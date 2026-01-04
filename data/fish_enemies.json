@@ -5,7 +5,7 @@
     { "id": "fish12", "path": "assets/fish/enemies/map1/fish05", "points": 10, "speed": 140, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 80, "weight": 12 },
     { "id": "hippocampus01", "path": "assets/fish/enemies/map1/hippocampus01", "points": 5, "speed": 115, "ai": "wander", "role": "prey", "min_pp": 0, "max_pp": 100, "weight": 10 },
 
-    { "id": "fish04", "path": "assets/fish/enemies/map1/fish04", "points": 40, "speed": 135, "ai": "dart", "role": "prey", "min_pp": 25, "max_pp": 160, "weight": 8 },
+    { "id": "fish04", "path": "assets/fish/enemies/map1/fish04", "points": 40, "speed": 135, "ai": "dart", "role": "prey", "min_pp": 25, "max_pp": 60, "weight": 8 },
     { "id": "fish01", "path": "assets/fish/enemies/map1/fish01", "points": 80, "speed": 110, "ai": "shy", "role": "prey", "min_pp": 60, "max_pp": 220, "weight": 6 },
 
     { "id": "fish06", "path": "assets/fish/enemies/map1/fish06", "points": 300, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 70, "max_pp": 160, "weight": 4 },
@@ -16,10 +16,10 @@
 
     { "id": "fish10", "path": "assets/fish/enemies/map1/fish10", "points": 70, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 180, "max_pp": 999, "weight": 2 },
     { "id": "fish11", "path": "assets/fish/enemies/map1/fish11", "points": 80, "speed": 140, "ai": "predator", "role": "predator", "min_pp": 200, "max_pp": 999, "weight": 1 },
-    { "id": "fish05", "path": "assets/fish/enemies/map1/fish12", "points": 90, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 240, "max_pp": 999, "weight": 1 },
+    { "id": "fish05", "path": "assets/fish/enemies/map1/fish12", "points": 90, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 240, "max_pp": 9999, "weight": 1 },
 
-    { "id": "squid01", "path": "assets/fish/enemies/map1/squid01", "points": 200, "speed": 145, "ai": "predator", "role": "predator", "min_pp": 110, "max_pp": 999, "weight": 2 },
-    { "id": "turtle01", "path": "assets/fish/enemies/map1/turtle01", "points": 400, "speed": 90, "ai": "predator", "role": "predator", "min_pp": 210, "max_pp": 999, "weight": 1 },
+    { "id": "squid01", "path": "assets/fish/enemies/map1/squid01", "points": 200, "speed": 145, "ai": "predator", "role": "predator", "min_pp": 110, "max_pp": 9999, "weight": 2 },
+    { "id": "turtle01", "path": "assets/fish/enemies/map1/turtle01", "points": 400, "speed": 90, "ai": "predator", "role": "predator", "min_pp": 210, "max_pp":99999, "weight": 1 },
 
     { "id": "boss_m1_300", "path": "assets/fish/enemies/map1/squid01", "points": 300, "speed": 170, "ai": "predator", "role": "predator", "min_pp": 140, "max_pp": 999, "weight": 1, "boss": true },
     { "id": "boss_m1_500", "path": "assets/fish/enemies/map1/fish10", "points": 500, "speed": 180, "ai": "predator", "role": "predator", "min_pp": 200, "max_pp": 999, "weight": 1, "boss": true }
@@ -42,13 +42,13 @@
 
     { "id": "fish10", "path": "assets/fish/enemies/map2/fish10", "points": 190, "speed": 130, "ai": "predator", "role": "predator", "min_pp": 50, "max_pp": 999, "weight": 2 },
     { "id": "fish11", "path": "assets/fish/enemies/map2/fish11", "points": 140, "speed": 120, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 999, "weight": 2 },
-    { "id": "fish12", "path": "assets/fish/enemies/map2/fish12", "points": 170, "speed": 110, "ai": "predator", "role": "predator", "min_pp": 50, "max_pp": 999, "weight": 1 },
+    { "id": "fish12", "path": "assets/fish/enemies/map2/fish12", "points": 170, "speed": 110, "ai": "predator", "role": "predator", "min_pp": 50, "max_pp": 9999, "weight": 1 },
 
-    { "id": "squid01", "path": "assets/fish/enemies/map2/squid01", "points": 275, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 40, "max_pp": 999, "weight": 3 },
+    { "id": "squid01", "path": "assets/fish/enemies/map2/squid01", "points": 275, "speed": 150, "ai": "predator", "role": "predator", "min_pp": 40, "max_pp": 9999, "weight": 3 },
     { "id": "turtle01", "path": "assets/fish/enemies/map2/turtle01", "points": 160, "speed": 95, "ai": "predator", "role": "predator", "min_pp": 280, "max_pp": 999, "weight": 1 },
 
     { "id": "boss_m2_500", "path": "assets/fish/enemies/map2/fish08", "points": 500, "speed": 175, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 999, "weight": 2, "boss": true },
-    { "id": "boss_m2_1200", "path": "assets/fish/enemies/map2/squid01", "points": 1200, "speed": 190, "ai": "predator", "role": "predator", "min_pp": 260, "max_pp": 999, "weight": 1, "boss": true },
+    { "id": "boss_m2_1200", "path": "assets/fish/enemies/map2/squid01", "points": 1200, "speed": 190, "ai": "predator", "role": "predator", "min_pp": 260, "max_pp": 9999, "weight": 1, "boss": true },
     { "id": "boss_m2_2000", "path": "assets/fish/enemies/map2/fish11", "points": 2000, "speed": 205, "ai": "predator", "role": "predator", "min_pp": 520, "max_pp": 999, "weight": 1, "boss": true }
   ],
 
@@ -71,11 +71,11 @@
     { "id": "fish11", "path": "assets/fish/enemies/map3/fish11", "points": 260, "speed": 120, "ai": "predator", "role": "predator", "min_pp": 360, "max_pp": 999, "weight": 2 },
     { "id": "fish12", "path": "assets/fish/enemies/map3/fish12", "points": 320, "speed": 110, "ai": "predator", "role": "predator", "min_pp": 420, "max_pp": 999, "weight": 1 },
 
-    { "id": "squid01", "path": "assets/fish/enemies/map3/squid01", "points": 110, "speed": 155, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 999, "weight": 3 },
+    { "id": "squid01", "path": "assets/fish/enemies/map3/squid01", "points": 110, "speed": 155, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 9999, "weight": 3 },
     { "id": "turtle01", "path": "assets/fish/enemies/map3/turtle01", "points": 240, "speed": 100, "ai": "predator", "role": "predator", "min_pp": 100, "max_pp": 999, "weight": 1 },
 
-    { "id": "boss_m3_1000", "path": "assets/fish/enemies/map3/fish09", "points": 1000, "speed": 185, "ai": "predator", "role": "predator", "min_pp": 220, "max_pp": 999, "weight": 2, "boss": true },
-    { "id": "boss_m3_2000", "path": "assets/fish/enemies/map3/squid01", "points": 2000, "speed": 200, "ai": "predator", "role": "predator", "min_pp": 520, "max_pp": 999, "weight": 1, "boss": true },
-    { "id": "boss_m3_3000", "path": "assets/fish/enemies/map3/turtle01", "points": 3000, "speed": 170, "ai": "predator", "role": "predator", "min_pp": 700, "max_pp": 999, "weight": 1, "boss": true }
+    { "id": "boss_m3_1000", "path": "assets/fish/enemies/map3/fish09", "points": 500, "speed": 185, "ai": "predator", "role": "predator", "min_pp": 220, "max_pp": 999, "weight": 2, "boss": true },
+    { "id": "boss_m3_2000", "path": "assets/fish/enemies/map3/squid01", "points": 1000, "speed": 200, "ai": "predator", "role": "predator", "min_pp": 720, "max_pp": 9999, "weight": 1, "boss": true },
+    { "id": "boss_m3_3000", "path": "assets/fish/enemies/map3/turtle01", "points": 1000, "speed": 170, "ai": "predator", "role": "predator", "min_pp": 800, "max_pp": 999, "weight": 1, "boss": true }
   ]
 }
